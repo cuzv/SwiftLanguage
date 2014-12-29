@@ -80,8 +80,11 @@ NSString *const kShowDetailSegue = @"ShowDetail";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCatalogCellIdentifier forIndexPath:indexPath];
-		
-	cell.textLabel.text = self.dataArray[indexPath.section][@"value"][indexPath.row][@"name"];
+	
+	NSString *name = self.dataArray[indexPath.section][@"value"][indexPath.row][@"name"];
+	NSString *title = [NSString stringWithFormat:@"%zd.%zd ", indexPath.section + 1, indexPath.row + 1];
+	name = [title stringByAppendingString:name];
+	cell.textLabel.text = name;
 	
 	return cell;
 }

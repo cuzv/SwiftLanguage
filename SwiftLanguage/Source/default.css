@@ -12,7 +12,7 @@ blockquote {
 body {
     font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
     font-size: 16px;
-    line-height: 22px;
+    line-height: 28px;
     color: #737373;
     background-color: white;
     margin: 10px 13px 10px 13px;
@@ -91,7 +91,7 @@ blockquote:before {
 blockquote p {
     font-size: 16px;
     font-weight: 300;
-    line-height: 22px;
+    line-height: 28px;
     margin-bottom: 0;
     font-style: italic;
 }
