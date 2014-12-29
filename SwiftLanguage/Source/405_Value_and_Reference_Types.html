@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en-US" >
+<meta charset='utf-8'><link rel='stylesheet' href='default.css'><link rel='stylesheet' href='default.css'><div class="page-inner">
+<script src='highlight.pack.js'></script><script>hljs.initHighlightingOnLoad();</script>
+<blockquote>
+<p>翻译：<a href="http://weibo.com/littlekok/" target="_blank">老码团队翻译组-Arya</a><br>校对：<a href="http://weibo.com/u/5241713117" target="_blank">老码团队翻译组-Jame</a></p>
+</blockquote>
+<h1 id="swift">Swift里的值类型与引用类型</h1>
+<hr>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#difference-two">值类型与引用类型的区别</a></li>
+<li><a href="#act-in=mutation">Mutation（修改）在安全中扮演的角色</a></li>
+<li><a href="#how-to-choose">如何选择类型</a></li>
+</ul>
+<h3 id="swift">Swift里面的类型分为两种：</h3>
+<ul>
+<li><strong>值类型(Value Types)</strong>：每个实例都保留了一分独有的数据拷贝，一般以结构体 <code>（struct）</code>、<code>枚举（enum）</code> 或者<code>元组（tuple）</code>的形式出现。</li>
+<li><strong>引用类型(Reference Type)</strong>：每个实例共享同一份数据来源，一般以<code>类（class）</code>的形式出现。</li>
+</ul>
+<p>在这篇博文里面，我们会介绍两种类型各自的优点，以及应该怎么选择使用。</p>
+<p><a name="difference-two"></a></p>
+<h4 id="">值类型与引用类型的区别</h4>
+<p>值类型和引用类型最基本的分别在复制之后的结果。当一个值类型被复制的时候，相当于创造了一个完全独立的实例，这个实例保有属于自己的独有数据，数据不会受到其他实例的数据变化影响：</p>
+<pre><code class="lang-swift">    <span class="hljs-comment">// 下面是一个值类型的例子</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">S</span> </span>{ <span class="hljs-keyword">var</span> data: <span class="hljs-type">Int</span> = -<span class="hljs-number">1</span> }
+    <span class="hljs-keyword">var</span> a = <span class="hljs-type">S</span>()
+    <span class="hljs-keyword">var</span> b = a                            <span class="hljs-comment">// b是a的拷贝</span>
+    a.data = <span class="hljs-number">42</span>                            <span class="hljs-comment">// 更改a的数据，b的不受影响</span>
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"<span class="hljs-subst">\(a.data)</span>, <span class="hljs-subst">\(b.data)</span>"</span>)        <span class="hljs-comment">// 输出结果 "42, -1"</span>
+</code></pre>
+<p>值类型就好像身份证复印件一样，复印出来之后，修改原件上面的内容，复印件上的内容不会变。</p>
+<p>另一方面，复制一个引用类型的时候，实际上是默默地创造了一个共享的实例分身，两者是共用一套数据。因此修改其中任何一个实例的数据，也会影响到另外那个。</p>
+<pre><code class="lang-swift">    <span class="hljs-comment">// 下面是一个引用类型的例子</span>
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">C</span> </span>{ <span class="hljs-keyword">var</span> data: <span class="hljs-type">Int</span> = -<span class="hljs-number">1</span> }
+    <span class="hljs-keyword">var</span> x = <span class="hljs-type">C</span>()
+    <span class="hljs-keyword">var</span> y = x                            <span class="hljs-comment">// y是x的拷贝</span>
+    x.data = <span class="hljs-number">42</span>                            <span class="hljs-comment">// 更改x的数据，等于同时修改了y</span>
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"<span class="hljs-subst">\(x.data)</span>, <span class="hljs-subst">\(y.data)</span>"</span>)        <span class="hljs-comment">// 输出结果 "42, 42"</span>
+</code></pre>
+<p><a name="act-in=mutation"></a></p>
+<h4 id="mutation">Mutation（修改）在安全中扮演的角色</h4>
+<p>值类型较引用类型来说，会让你更容易在大量代码中理清状况。如果你总是得到一个独立的拷贝出来的实例，你就可以放心它不会被你app里面的其他部分代码默默地修改。这在多线程的环境里面是尤为重要的，因为另外一个线程可能会在暗地里修改你的数据。因此可能会造成严重的程序错误，这在调试过程中非常难以排除。</p>
+<p>由于差别主要在于修改数据的后果，那么当实例的数据只读，不存在需要更改的情况下，用哪种类型都是没有分别的。</p>
+<p>你可能在想，有的时候我可能也需要一个完全不变的类。这样使用<code>Cocoa NSObject</code>对象的时候会比较容易，又可以保留值语义的好处。在今天，你可以通过只使用不可变的存储属性，和避开任何可以修改状态的API，用Swift写出一个不可变类<code>（immutable class）</code>。实际上，很多基本的Cocoa类，例如<code>NSURL</code>，都是设计成不可变类的。然而，Swift语言目前只强制<code>struct</code>和<code>enum</code>这种值类型的不可变性，对类这种引用类型则没有。（例如还不支持强制将子类的限制为不可变类）</p>
+<p><a name="how-to-choose"></a></p>
+<h4 id="">如何选择类型？</h4>
+<p>所以当我们想要建立一个新的类型的时候，怎么决定用值类型还是引用类型呢？当你使用Cocoa框架的时候，很多API都要通过NSObject的子类使用，所以这时候必须要用到引用类型class。在其他情况下，有下面几个准则：</p>
+<ul>
+<li><p><strong>什么时候该用值类型</strong>：</p>
+<ul>
+<li>要用==运算符来比较实例的数据时</li>
+<li>你希望那个实例的拷贝能保持独立的状态时</li>
+<li>数据会被多个线程使用时</li>
+</ul>
+</li>
+<li><p><strong>什么时候该用引用类型（class）</strong>：</p>
+<ul>
+<li>要用==运算符来比较实例身份的时候</li>
+<li>你希望有创建一个共享的、可变对象的时候</li>
+</ul>
+</li>
+</ul>
+<p>在Swift里面，数组(Array)、字符串(String)、字典(Dictionary)都属于值类型。它们就像C语言里面简单的int值，是一个个独立的数据个体。你不需要花任何功夫来防范其他代码在暗地里修改它们。更重要的是，你可以在线程之间安全的传递变量，而不需要特地去同步。在Swift高安全性的精神下，这个模式会帮助你用Swift写出更可控的代码。</p>
+<hr>
+<p>本章节不是老码的原创，老码认真的阅读了苹果的官方博客，且自己的练习总结，如果小伙伴们费了吃奶的劲还是看不懂，请找度娘谷歌，还是看不懂请到老码<a href="http://weibo.com/u/5241713117" target="_blank">官方微博</a>咆哮。  </p>
+<h5 id="apple-swift-blog-value-and-reference-typeshttpsdeveloperapplecomswiftblogid10">本文由翻译自Apple Swift Blog ：<a href="https://developer.apple.com/swift/blog/?id=10" target="_blank">Value and Reference Types</a></h5>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../chapter4/04_Interacting_with_C_Pointers.html" class="navigation navigation-prev " aria-label="Previous page: Swift与C语言指针友好合作"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../chapter4/06_Access_Control_and_Protected.html" class="navigation navigation-next " aria-label="Next page: 访问控制和Protected"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2}};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
+</html>

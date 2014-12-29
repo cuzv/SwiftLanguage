@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html lang="en-US" >
+<meta charset='utf-8'><link rel='stylesheet' href='default.css'><link rel='stylesheet' href='default.css'><div class="page-inner">
+<script src='highlight.pack.js'></script><script>hljs.initHighlightingOnLoad();</script>
+<blockquote>
+<p>翻译：<a href="http://weibo.com/u/5241713117" target="_blank">老码团队翻译组-Tyrion</a>
+校对：<a href="http://weibo.com/u/5241713117" target="_blank">老码团队翻译组-Oberyn</a></p>
+</blockquote>
+<h1 id="-swift">造个类型不是梦-白话Swift类型创建</h1>
+<hr>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#prototype">自定义原型</a></li>
+<li><a href="#imp-default">实现默认值</a></li>
+<li><a href="#init-by-bool">支持基本布尔型初始化</a></li>
+<li><a href="#condition-by-bool">支持Bool类型判断</a></li>
+<li><a href="#support-all-type">支持兼容各们各派的类型</a></li>
+<li><a href="#make-up-type">完善OCBool的布尔基因体系</a></li>
+</ul>
+<p>小伙伴们，Swift中的Bool类型有着非常重要的语法功能，并支撑起了整个Swift体系中的逻辑判断体系，经过老码的研究和学习， Bool类型本身其实是对基础Boolean类型封装，小伙伴们可能咬着手指头问老码，怎么一会Bool类型，一会Boolean类型，其区别在于，前者是基于枚举的组合类型，而后者则是基本类型，只有两种true和false。</p>
+<p><a name="prefix_expressions"></a></p>
+<h4 id="">自定义原型</h4>
+<p>接下老码根据Bool的思想来创建一个OCBool类型，来让小伙伴们了解一下Swift中到底是怎么玩儿的。
+来我们先看一下OCBool的定义。</p>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">OCBool</span></span>{
+<span class="hljs-keyword">case</span> ocTrue
+<span class="hljs-keyword">case</span> ocFalse
+}
+</code></pre>
+<h5 id="">注意：</h5>
+<ul>
+<li>代码中第2行和第3行，可以合并到一行写，如苹果官方Blog所写的一样</li>
+<li>代码中命名需要注意：OCBool是类型名，所以首字母必须大写，而case中的ocTrue和ocFalse是小类型则需要首字母小写。</li>
+</ul>
+<p><a name="imp-default"></a></p>
+<h4 id="">实现默认值</h4>
+<p>行，我们给了一个漂亮的定义，不过按照传统语言的经验，Bool值默认情况下是假， 所以我们的OCBool也应该如此，我们使用类型扩展技术增加这个默认特性：</p>
+<pre><code class="lang-swift"><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span></span>{
+     <span class="hljs-keyword">init</span>(){
+             <span class="hljs-keyword">self</span> =.ocFalse
+     }
+}
+</code></pre>
+<h5 id="">注意：</h5>
+<ul>
+<li>代码中第1行：extension关键字，非常强大，小伙伴们可以通过此创造出许多好玩的东西，建议各位去Github上看一个名为“Swiftz”的项目，它将扩展用到了极致。</li>
+<li>代码中第3行：self = .ocFalse语法，刚入门的小伙伴们很迷糊，为什么会有奇怪的点语法，因为大牛Chris在Swift中增加了类型智能推断功能，在苹果Blog中，提到了“Context”概念，就是这个意思，因为这行语句是在枚举OCBool中的，其上下文就是OCBool的定义体，编译器当然知道.ocFalse就是OCBool.ocFalse了，所以这里直接点语法，非常整齐。
+现在我们可以使用如下方法使用这个Bool类型。</li>
+</ul>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> result:<span class="hljs-type">OCBool</span> = <span class="hljs-type">OCBool</span>()
+<span class="hljs-keyword">var</span> result1:<span class="hljs-type">OCBool</span> = .ocTrue
+</code></pre>
+<p><a name="init-by-bool"></a></p>
+<h4 id="">支持基本布尔型初始化</h4>
+<p>正如上述代码所述，我们只能通过类型或者枚举项目赋值，这是组合类型的用法，但是编码的日子里，我们总是希望和true，false直接打交道，也就是说，我们希望这么做，
+代码示例如下：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> isSuccess:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+</code></pre>
+<p>如果小伙伴们直接这么用，则会出现如下错误：</p>
+<pre><code>/Users/tyrion-OldCoder/Documents/Learning/BoolType/BoolType/main.swift:30:24: Type &#39;OCBool&#39; does not conform to protocol &#39;BooleanLiteralConvertible&#39;
+</code></pre><p>编译器咆哮的原因是，我们的类型没有遵从“布尔字面量转换协议”，接下来修正这个问题，</p>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-keyword">import</span> <span class="hljs-type">Foundation</span>
+
+<span class="hljs-built_in">println</span>(<span class="hljs-string">"Hello, World!"</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">case</span> ocTrue
+    <span class="hljs-keyword">case</span> ocFalse
+}
+
+
+<span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span>: <span class="hljs-title">BooleanLiteralConvertible</span></span>{
+<span class="hljs-keyword">static</span> <span class="hljs-func"><span class="hljs-keyword">func</span> <span class="hljs-title">convertFromBooleanLiteral</span><span class="hljs-params">( value: Bool)</span> -&gt;<span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">return</span> value ? ocTrue : ocFalse
+    }
+}
+
+<span class="hljs-keyword">var</span> isSuccess:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+</code></pre>
+<h5 id="">注意：</h5>
+<ul>
+<li><p>代码中的第11行是重点，我的类型OCBool支持了BooleanLiteralConvertible协议，这个协到底是干什么的呢，小伙伴们在Xcode代码编辑器，按住Command键，然后点击第11行中的BooleanLiteralConvertible协议名，则会进入它的定义，</p>
+<h5 id="">其定义如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-class"><span class="hljs-keyword">protocol</span> <span class="hljs-title">BooleanLiteralConvertible</span> </span>{
+  <span class="hljs-keyword">typealias</span> <span class="hljs-type">BooleanLiteralType</span>
+  <span class="hljs-keyword">class</span> <span class="hljs-func"><span class="hljs-keyword">func</span> <span class="hljs-title">convertFromBooleanLiteral</span><span class="hljs-params">(value: BooleanLiteralType)</span> -&gt; <span class="hljs-title">Self</span>
+}</span>
+</code></pre>
+</li>
+<li><p>这个定义中有个类方法convertFromBooleanLiteral，它的参数为BooleanLiteralType类型，也就是我传入的Bool类型， 且返回值为实现这个协议的类型本身，在我们的OCBool类型中，其返回值就是OCBool本身。经过这个定义，我们可以直接对OCBool类型直接进行布尔字面量初始化了。</p>
+</li>
+</ul>
+<p><a name="condition-by-bool"></a></p>
+<h4 id="bool">支持Bool类型判断</h4>
+<p>小伙伴们不安分， 肯定想着我怎么用它实现逻辑判断，所以如果你这么写，</p>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> isSuccess:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+
+<span class="hljs-keyword">if</span> isSuccess {
+    <span class="hljs-built_in">println</span>( <span class="hljs-string">"老码请你吃火锅！"</span>)
+}
+</code></pre>
+<p>你永远吃不到老码的火锅，因为这里编译器会咆哮：</p>
+<pre><code>/Users/tyrion-OldCoder/Documents/Learning/BoolType/BoolType/main.swift:27:4: Type &#39;OCBool&#39; does not conform to protocol &#39;LogicValue&#39;
+</code></pre><p>OCBool现在只能用bool类型初始化，而不能直接返回bool型，小火把们还记得在《老码说编程之白话Swift江湖》中，老码多次提到，妈妈再也不担心我们 if a = 1{}的写法了， 因为等号不支持值返回了， 所以在if判断是后面的条件必须有返回值，OCBool没有，所以编译器哭了。我们解决这个问题。</p>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-keyword">import</span> <span class="hljs-type">Foundation</span>
+
+<span class="hljs-built_in">println</span>(<span class="hljs-string">"Hello, World!"</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">case</span> ocTrue
+    <span class="hljs-keyword">case</span> ocFalse
+}
+
+
+<span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span>: <span class="hljs-title">BooleanLiteralConvertible</span></span>{
+<span class="hljs-keyword">static</span> <span class="hljs-func"><span class="hljs-keyword">func</span> <span class="hljs-title">convertFromBooleanLiteral</span><span class="hljs-params">( value: Bool)</span> -&gt;<span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">return</span> value ? ocTrue : ocFalse
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span>: <span class="hljs-title">LogicValue</span></span>{
+    <span class="hljs-func"><span class="hljs-keyword">func</span> <span class="hljs-title">getLogicValue</span><span class="hljs-params">()</span> -&gt;<span class="hljs-title">Bool</span> </span>{
+        <span class="hljs-keyword">var</span> boolValue: <span class="hljs-type">Bool</span>{
+        <span class="hljs-keyword">switch</span> <span class="hljs-keyword">self</span>{
+        <span class="hljs-keyword">case</span> .ocTrue:
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">true</span>
+        <span class="hljs-keyword">case</span> .ocFalse:
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">false</span>
+            }
+        }
+        <span class="hljs-keyword">return</span> boolValue
+    }
+}
+
+
+<span class="hljs-keyword">var</span> isSuccess:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+
+<span class="hljs-keyword">if</span> isSuccess {
+    <span class="hljs-built_in">println</span>( <span class="hljs-string">"老码请你吃火锅！"</span>)
+}
+</code></pre>
+<h4 id="">运行结果如下：</h4>
+<pre><code>Hello, World!
+老码请你吃火锅！
+Program ended with exit code: 0
+</code></pre><h5 id="">注意：</h5>
+<ul>
+<li>如果小伙伴们现在用的是Beta版的Xcode，注意苹果官方Blog中，在代码第17行如果在Xcode Beta4下是错误的，这里的协议是，LogicValue而不是BooleanVue，所以记得看错误提示才是好习惯。</li>
+<li>注意代码第34行，完美支持if判断，且输出结果为“老码请你吃火锅”，老码也是说说而已，请不要当真。</li>
+</ul>
+<p></a><a name="support-all-type"></a></p>
+<h4 id="">支持兼容各们各派的类型</h4>
+<p>小伙伴们，江湖风险，门派众多，老码有自己的OCBool类型，可能嵩山少林有自己的SSBool类型，甚至连郭美美都可能有自己的MMBool类型，所以OCBool必须能够识别这些类型，这些各门各派的类型，只要支持LogicValue协议，就应该可以被识别，看老码怎么做，</p>
+<h5 id="">代码示例如下：</h5>
+<pre><code class="lang-swift"><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">init</span>( <span class="hljs-number">_</span> v: <span class="hljs-type">LogicValue</span> )
+    {
+        <span class="hljs-keyword">if</span> v.getLogicValue(){
+            <span class="hljs-keyword">self</span> = .ocTrue
+        }
+        <span class="hljs-keyword">else</span>{
+            <span class="hljs-keyword">self</span> = .ocFalse
+        }
+    }
+
+}
+
+<span class="hljs-keyword">var</span> mmResult: <span class="hljs-type">Bool</span> = <span class="hljs-built_in">true</span>
+<span class="hljs-keyword">var</span> ocResult:<span class="hljs-type">OCBool</span> = <span class="hljs-type">OCBool</span>(mmResult)
+
+
+<span class="hljs-keyword">if</span> ocResult {
+    <span class="hljs-built_in">println</span>( <span class="hljs-string">"老码没钱，郭美美请你吃火锅！"</span>)
+}
+</code></pre>
+<h5 id="">代码运行结果如下：</h5>
+<pre><code>Hello, World!
+老码没钱，郭美美请你吃火锅！
+Program ended with exit code: 0
+</code></pre><p>漂亮！我们的OCBool类型现在支持了所有的逻辑变量初始化。</p>
+<h5 id="">注意：</h5>
+<ul>
+<li>代码中第2行：“_”下横杠的用法，这是一个功能强大的小强，在此的目的是屏蔽外部参数名，所以小伙伴们可以直接：var ocResult:OCBool = OCBool(mmResult)而不是：var ocResult:OCBool = OCBool(v: mmResult)，小伙伴们惊呆了！这个init函数中本来就没有外部参数名啊，还记得老码在书里说过没，Swift的初始化函数会默认使用内部参数名，作为外部参数名。</li>
+</ul>
+<p><a name="make-up-type"></a></p>
+<h4 id="ocbool">完善OCBool的布尔基因体系：</h4>
+<p>小伙伴们，bool类型的价值就是在于各种判断，诸如==，!=, &amp;，|,^,!，以及各种组合逻辑运算，我们OCBool也要具备这些功能，否则就会基因缺陷，且看老码如何实现：</p>
+<pre><code class="lang-swift"><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">OCBool</span>: <span class="hljs-title">Equatable</span></span>{
+}
+
+<span class="hljs-comment">//支持等值判断运算符</span>
+<span class="hljs-func"><span class="hljs-keyword">func</span> ==<span class="hljs-params">( <span class="hljs-keyword">left</span>: OCBool, <span class="hljs-keyword">right</span>: OCBool )</span>-&gt;<span class="hljs-title">Bool</span></span>{
+    <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">left</span>, <span class="hljs-keyword">right</span>){
+    <span class="hljs-keyword">case</span> (.ocTrue, .ocTrue):
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">true</span>
+    <span class="hljs-keyword">default</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">false</span>
+    }
+}
+<span class="hljs-comment">//支持位与运算符</span>
+<span class="hljs-func"><span class="hljs-keyword">func</span> &amp;<span class="hljs-params">( <span class="hljs-keyword">left</span>:OCBool, <span class="hljs-keyword">right</span>: OCBool)</span>-&gt;<span class="hljs-title">OCBool</span></span>{
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">left</span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">right</span>
+    }
+    <span class="hljs-keyword">else</span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">false</span>
+    }
+}
+<span class="hljs-comment">//支持位或运算符</span>
+<span class="hljs-func"><span class="hljs-keyword">func</span> |<span class="hljs-params">( <span class="hljs-keyword">left</span>:OCBool, <span class="hljs-keyword">right</span>: OCBool)</span>-&gt;<span class="hljs-title">OCBool</span></span>{
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">left</span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">true</span>
+    }
+    <span class="hljs-keyword">else</span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">right</span>
+    }
+}
+
+<span class="hljs-comment">//支持位异或运算符</span>
+<span class="hljs-func"><span class="hljs-keyword">func</span> ^<span class="hljs-params">( <span class="hljs-keyword">left</span>:OCBool, <span class="hljs-keyword">right</span>: OCBool)</span>-&gt;<span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-type">OCBool</span>( <span class="hljs-keyword">left</span> != <span class="hljs-keyword">right</span> )
+}
+<span class="hljs-comment">//支持求反运算符</span>
+<span class="hljs-preprocessor">@prefix</span> <span class="hljs-func"><span class="hljs-keyword">func</span> !<span class="hljs-params">( a:OCBool )</span>-&gt; <span class="hljs-title">OCBool</span></span>{
+    <span class="hljs-keyword">return</span> a ^ <span class="hljs-built_in">true</span>
+}
+<span class="hljs-comment">//支持组合求与运算符</span>
+<span class="hljs-func"><span class="hljs-keyword">func</span> &amp;= <span class="hljs-params">(<span class="hljs-keyword">inout</span> <span class="hljs-keyword">left</span>:OCBool, <span class="hljs-keyword">right</span>:OCBool )</span></span>{
+    <span class="hljs-keyword">left</span> = <span class="hljs-keyword">left</span> &amp; <span class="hljs-keyword">right</span>
+}
+
+
+<span class="hljs-keyword">var</span> isHasMoney:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+<span class="hljs-keyword">var</span> isHasWife:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+<span class="hljs-keyword">var</span> isHasHealty:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+<span class="hljs-keyword">var</span> isHasLover:<span class="hljs-type">OCBool</span> = <span class="hljs-built_in">true</span>
+
+isHasMoney != isHasHealty
+isHasHealty == isHasMoney
+isHasWife ^ isHasLover
+isHasWife = !isHasLover
+
+<span class="hljs-keyword">if</span> (isHasMoney | isHasHealty) &amp; isHasHealty{
+    <span class="hljs-built_in">println</span>( <span class="hljs-string">"人生赢家，就像老码一样！"</span>)
+}<span class="hljs-keyword">else</span>
+{
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"人生最苦的事事，人死了钱没花了，人生最苦的事是，人活着，钱没了！"</span>)
+}
+</code></pre>
+<p>好了，到这里就到这里了，窗外的雷声叫醒了老码，现在应该去吃饭了，以上老码给大家展示了如果制造一个自己的类型，记得老码的示例是在Xcode6 Beta4下测试的，至于Beta5的改变还没有涉及，小伙伴们要好生练习，以后各种自定类型都是基于这个思想。还有这个章节不是老码的原创，老码认真的阅读了苹果的官方博客，且自己的练习总结，如果小伙伴们费了吃奶的劲还是看不懂，请找度娘谷歌，还是看不懂请到老码官方微博：<a href="http://weibo.com/u/5241713117咆哮。" target="_blank">http://weibo.com/u/5241713117咆哮。</a></p>
+<p>本文由翻译自Apple Swift Blog ：<a href="https://developer.apple.com/swift/blog/?id=8" target="_blank">https://developer.apple.com/swift/blog/?id=8</a></p>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../chapter4/01_Access_Control.html" class="navigation navigation-prev " aria-label="Previous page: Access Control 权限控制的黑与白"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../chapter4/03_Ballons.html" class="navigation navigation-next " aria-label="Next page: WWDC里面的那个“大炮打气球”"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2}};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
+</html>

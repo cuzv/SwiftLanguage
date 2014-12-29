@@ -1,0 +1,347 @@
+<!DOCTYPE HTML>
+<html lang="en-US" >
+<meta charset='utf-8'><link rel='stylesheet' href='default.css'><link rel='stylesheet' href='default.css'><div class="page-inner">
+<script src='highlight.pack.js'></script><script>hljs.initHighlightingOnLoad();</script>
+                    
+                        <blockquote>
+<p>翻译：<a href="https://github.com/wh1100717" target="_blank">wh1100717</a><br>校对：<a href="https://github.com/Hawstein" target="_blank">Hawstein</a></p>
+</blockquote>
+<h1 id="strings-and-characters">字符串和字符（Strings and Characters）</h1>
+<hr>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#string_literals">字符串字面量</a></li>
+<li><a href="#initializing_an_empty_string">初始化空字符串</a></li>
+<li><a href="#string_mutability">字符串可变性</a></li>
+<li><a href="#strings_are_value_types">字符串是值类型</a></li>
+<li><a href="#working_with_characters">使用字符</a></li>
+<li><a href="#counting_characters">计算字符数量</a></li>
+<li><a href="#concatenating_strings_and_characters">连接字符串和字符</a></li>
+<li><a href="#string_interpolation">字符串插值</a></li>
+<li><a href="#comparing_strings">比较字符串</a></li>
+<li><a href="#uppercase_and_lowercase_strings">字符串大小写</a></li>
+<li><a href="#unicode">Unicode</a></li>
+</ul>
+<p><code>String</code>是例如“hello, world”，“海贼王” 这样的有序的<code>Character</code>（字符）类型的值的集合，通过<code>String</code>类型来表示。</p>
+<p>Swift 的<code>String</code>和<code>Character</code>类型提供了一个快速的，兼容 Unicode 的方式来处理代码中的文本信息。
+创建和操作字符串的语法与 C 语言中字符串操作相似，轻量并且易读。
+字符串连接操作只需要简单地通过<code>+</code>号将两个字符串相连即可。
+与 Swift 中其他值一样，能否更改字符串的值，取决于其被定义为常量还是变量。</p>
+<p>尽管语法简易，但<code>String</code>类型是一种快速、现代化的字符串实现。
+每一个字符串都是由独立编码的 Unicode 字符组成，并提供了以不同 Unicode 表示（representations）来访问这些字符的支持。</p>
+<p>Swift 可以在常量、变量、字面量和表达式中进行字符串插值操作，可以轻松创建用于展示、存储和打印的自定义字符串。</p>
+<blockquote>
+<p>注意：<br>Swift 的<code>String</code>类型与 Foundation <code>NSString</code>类进行了无缝桥接。如果您利用 Cocoa 或 Cocoa Touch 中的 Foundation 框架进行工作。所有<code>NSString</code> API 都可以调用您创建的任意<code>String</code>类型的值。除此之外，还可以使用本章介绍的<code>String</code>特性。您也可以在任意要求传入<code>NSString</code>实例作为参数的 API 中使用<code>String</code>类型的值作为替代。
+更多关于在 Foundation 和 Cocoa 中使用<code>String</code>的信息请查看 <a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/BuildingCocoaApps/index.html#//apple_ref/doc/uid/TP40014216" target="_blank">Using Swift with Cocoa and Objective-C</a>。  </p>
+</blockquote>
+<p><a name="string_literals"></a></p>
+<h2 id="string-literals">字符串字面量（String Literals）</h2>
+<p>您可以在您的代码中包含一段预定义的字符串值作为字符串字面量。
+字符串字面量是由双引号 (&quot;&quot;) 包裹着的具有固定顺序的文本字符集。</p>
+<p>字符串字面量可以用于为常量和变量提供初始值。</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> someString = <span class="hljs-string">"Some string literal value"</span>
+</code></pre>
+<blockquote>
+<p>注意：<br><code>someString</code>常量通过字符串字面量进行初始化，Swift 因此推断该常量为<code>String</code>类型。</p>
+</blockquote>
+<p>字符串字面量可以包含以下特殊字符：</p>
+<ul>
+<li>转义字符<code>\0</code>(空字符)、<code>\\</code>(反斜线)、<code>\t</code>(水平制表符)、<code>\n</code>(换行符)、<code>\r</code>(回车符)、<code>\&quot;</code>(双引号)、<code>\&#39;</code>(单引号)。</li>
+<li>Unicode 标量，写成<code>\u{n}</code>(u为小写)，其中<code>n</code>为任意的一到八位十六进制数。</li>
+</ul>
+<p>下面的代码为各种特殊字符的使用示例。
+<code>wiseWords</code>常量包含了两个转移特殊字符 (双括号)；
+<code>dollarSign</code>、<code>blackHeart</code>和<code>sparklingHeart</code>常量演示了三种不同格式的 Unicode 标量：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> wiseWords = <span class="hljs-string">"\"我是要成为海贼王的男人\" - 路飞"</span>
+<span class="hljs-comment">// "我是要成为海贼王的男人" - 路飞</span>
+<span class="hljs-keyword">let</span> dollarSign = <span class="hljs-string">"\u{24}"</span>             <span class="hljs-comment">// $,  Unicode 标量 U+0024</span>
+<span class="hljs-keyword">let</span> blackHeart = <span class="hljs-string">"\u{2665}"</span>           <span class="hljs-comment">// ♥,  Unicode 标量 U+2665</span>
+<span class="hljs-keyword">let</span> sparklingHeart = <span class="hljs-string">"\u{1F496}"</span>  <span class="hljs-comment">// 💖, Unicode 标量 U+1F496</span>
+</code></pre>
+<p><a name="initializing_an_empty_string"></a></p>
+<h2 id="-initializing-an-empty-string">初始化空字符串 (Initializing an Empty String)</h2>
+<p>为了构造一个很长的字符串，可以创建一个空字符串作为初始值。
+可以将空的字符串字面量赋值给变量，也可以初始化一个新的<code>String</code>实例：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> emptyString = <span class="hljs-string">""</span>               <span class="hljs-comment">// 空字符串字面量</span>
+<span class="hljs-keyword">var</span> anotherEmptyString = <span class="hljs-type">String</span>()  <span class="hljs-comment">// 初始化 String 实例</span>
+<span class="hljs-comment">// 两个字符串均为空并等价。</span>
+</code></pre>
+<p>您可以通过检查其<code>Boolean</code>类型的<code>isEmpty</code>属性来判断该字符串是否为空：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">if</span> emptyString.isEmpty {
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"什么都没有"</span>)
+}
+<span class="hljs-comment">// 打印输出："什么都没有"</span>
+</code></pre>
+<p><a name="string_mutability"></a></p>
+<h2 id="-string-mutability">字符串可变性 (String Mutability)</h2>
+<p>您可以通过将一个特定字符串分配给一个变量来对其进行修改，或者分配给一个常量来保证其不会被修改：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> variableString = <span class="hljs-string">"Horse"</span>
+variableString += <span class="hljs-string">" and carriage"</span>
+<span class="hljs-comment">// variableString 现在为 "Horse and carriage"</span>
+<span class="hljs-keyword">let</span> constantString = <span class="hljs-string">"Highlander"</span>
+constantString += <span class="hljs-string">" and another Highlander"</span>
+<span class="hljs-comment">// 这会报告一个编译错误 (compile-time error) - 常量不可以被修改。</span>
+</code></pre>
+<blockquote>
+<p>注意：<br>在 Objective-C 和 Cocoa 中，您通过选择两个不同的类(<code>NSString</code>和<code>NSMutableString</code>)来指定该字符串是否可以被修改，Swift 中的字符串是否可以修改仅通过定义的是变量还是常量来决定，实现了多种类型可变性操作的统一。</p>
+</blockquote>
+<p><a name="strings_are_value_types"></a></p>
+<h2 id="strings-are-value-types">字符串是值类型（Strings Are Value Types）</h2>
+<p>Swift 的<code>String</code>类型是值类型。
+如果您创建了一个新的字符串，那么当其进行常量、变量赋值操作或在函数/方法中传递时，会进行值拷贝。
+任何情况下，都会对已有字符串值创建新副本，并对该新副本进行传递或赋值操作。
+值类型在 <a href="09_Classes_and_Structures.html#structures_and_enumerations_are_value_types">结构体和枚举是值类型</a> 中进行了说明。</p>
+<blockquote>
+<p>注意：<br>与 Cocoa 中的<code>NSString</code>不同，当您在 Cocoa 中创建了一个<code>NSString</code>实例，并将其传递给一个函数/方法，或者赋值给一个变量，您传递或赋值的是该<code>NSString</code>实例的一个引用，除非您特别要求进行值拷贝，否则字符串不会生成新的副本来进行赋值操作。</p>
+</blockquote>
+<p>Swift 默认字符串拷贝的方式保证了在函数/方法中传递的是字符串的值。
+很明显无论该值来自于哪里，都是您独自拥有的。
+您可以放心您传递的字符串本身不会被更改。</p>
+<p>在实际编译时，Swift 编译器会优化字符串的使用，使实际的复制只发生在绝对必要的情况下，这意味着您将字符串作为值类型的同时可以获得极高的性能。</p>
+<p><a name="working_with_characters"></a></p>
+<h2 id="working-with-characters">使用字符（Working with Characters）</h2>
+<p>Swift 的<code>String</code>类型表示特定序列的<code>Character</code>（字符） 类型值的集合。
+每一个字符值代表一个 Unicode 字符。
+您可利用<code>for-in</code>循环来遍历字符串中的每一个字符：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">for</span> character <span class="hljs-keyword">in</span> <span class="hljs-string">"Dog!🐶"</span> {
+    <span class="hljs-built_in">println</span>(character)
+}
+<span class="hljs-comment">// D</span>
+<span class="hljs-comment">// o</span>
+<span class="hljs-comment">// g</span>
+<span class="hljs-comment">// !</span>
+<span class="hljs-comment">// 🐶</span>
+</code></pre>
+<p>for-in 循环在 <a href="05_Control_Flow.html#for_loops">For Loops</a> 中进行了详细描述。</p>
+<p>另外，通过标明一个<code>Character</code>类型注解并通过字符字面量进行赋值，可以建立一个独立的字符常量或变量：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> yenSign: <span class="hljs-type">Character</span> = <span class="hljs-string">"¥"</span>
+</code></pre>
+<p><a name="counting_characters"></a></p>
+<h2 id="-counting-characters">计算字符数量 (Counting Characters)</h2>
+<p>通过调用全局<code>countElements</code>函数，并将字符串作为参数进行传递，可以获取该字符串的字符数量。</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> unusualMenagerie = <span class="hljs-string">"Koala 🐨, Snail 🐌, Penguin 🐧, Dromedary 🐪"</span>
+<span class="hljs-built_in">println</span>(<span class="hljs-string">"unusualMenagerie has <span class="hljs-subst">\(<span class="hljs-built_in">countElements</span>(unusualMenagerie)</span>) characters"</span>)
+<span class="hljs-comment">// 打印输出："unusualMenagerie has 40 characters"</span>
+</code></pre>
+<blockquote>
+<p>注意：<br>不同的 Unicode 字符以及相同 Unicode 字符的不同表示方式可能需要不同数量的内存空间来存储。所以 Swift 中的字符在一个字符串中并不一定占用相同的内存空间。因此字符串的长度不得不通过迭代字符串中每一个字符的长度来进行计算。如果您正在处理一个长字符串，需要注意<code>countElements</code>函数必须遍历字符串中的字符以精准计算字符串的长度。
+另外需要注意的是通过<code>countElements</code>返回的字符数量并不总是与包含相同字符的<code>NSString</code>的<code>length</code>属性相同。<code>NSString</code>的<code>length</code>属性是基于利用 UTF-16 表示的十六位代码单元数字，而不是基于 Unicode 字符。为了解决这个问题，<code>NSString</code>的<code>length</code>属性在被 Swift 的<code>String</code>访问时会成为<code>utf16count</code>。  </p>
+</blockquote>
+<p><a name="concatenating_strings_and_characters"></a></p>
+<h2 id="-concatenating-strings-and-characters">连接字符串和字符 (Concatenating Strings and Characters)</h2>
+<p>字符串可以通过加法运算符（<code>+</code>）相加在一起（或称“串联”）并创建一个新的字符串：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> string1 = <span class="hljs-string">"hello"</span>
+<span class="hljs-keyword">let</span> string2 = <span class="hljs-string">" there"</span>
+<span class="hljs-keyword">var</span> welcome = string1 +　string2
+<span class="hljs-comment">// welcome 现在等于 "hello there"</span>
+</code></pre>
+<p>您也可以通过加法赋值运算符 (<code>+=</code>) 将一个字符串添加到一个已经存在字符串变量上：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> <span class="hljs-keyword">in</span><span class="hljs-class"><span class="hljs-keyword">struct</span><span class="hljs-title">ion</span> = "<span class="hljs-title">look</span> <span class="hljs-title">over</span>"
+<span class="hljs-title">instruction</span> += <span class="hljs-title">string2</span>
+// <span class="hljs-title">instruction</span> 现在等于　"<span class="hljs-title">look</span> <span class="hljs-title">over</span> <span class="hljs-title">there</span>"</span>
+</code></pre>
+<p>你可以用将<code>append</code>方法将一个字符附加到一个字符串变量的尾部：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> exclamationMark: <span class="hljs-type">Character</span> = <span class="hljs-string">"!"</span>
+welcome.append(exclamationMark)
+<span class="hljs-comment">// welcome 现在等于 "hello there!"</span>
+</code></pre>
+<blockquote>
+<p>注意：<br>您不能将一个字符串或者字符添加到一个已经存在的字符变量上，因为字符变量只能包含一个字符。</p>
+</blockquote>
+<p><a name="string_interpolation"></a></p>
+<h2 id="-string-interpolation">字符串插值 (String Interpolation)</h2>
+<p>字符串插值是一种构建新字符串的方式，可以在其中包含常量、变量、字面量和表达式。
+您插入的字符串字面量的每一项都被包裹在以反斜线为前缀的圆括号中：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> multiplier = <span class="hljs-number">3</span>
+<span class="hljs-keyword">let</span> message = <span class="hljs-string">"<span class="hljs-subst">\(multiplier)</span> 乘以 2.5 是 <span class="hljs-subst">\(Double(multiplier)</span> * 2.5)"</span>
+<span class="hljs-comment">// message 是 "3 乘以 2.5 是 7.5"</span>
+</code></pre>
+<p>在上面的例子中，<code>multiplier</code>作为<code>\(multiplier)</code>被插入到一个字符串字面量中。
+当创建字符串执行插值计算时此占位符会被替换为<code>multiplier</code>实际的值。</p>
+<p><code>multiplier</code>的值也作为字符串中后面表达式的一部分。
+该表达式计算<code>Double(multiplier) * 2.5</code>的值并将结果 (7.5) 插入到字符串中。
+在这个例子中，表达式写为<code>\(Double(multiplier) * 2.5)</code>并包含在字符串字面量中。</p>
+<blockquote>
+<p>注意：<br>插值字符串中写在括号中的表达式不能包含非转义双引号 (<code>&quot;</code>) 和反斜杠 (<code>\</code>)，并且不能包含回车或换行符。</p>
+</blockquote>
+<p><a name="comparing_strings"></a></p>
+<h2 id="-comparing-strings">比较字符串 (Comparing Strings)</h2>
+<p>Swift 提供了三种方式来比较字符串的值：字符串相等、前缀相等和后缀相等。</p>
+<p><a name="string_equality"></a></p>
+<h3 id="-string-equality">字符串相等 (String Equality)</h3>
+<p>如果两个字符串以同一顺序包含完全相同的字符，则认为两者字符串相等：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> quotation = <span class="hljs-string">"我们是一样一样滴."</span>
+<span class="hljs-keyword">let</span> sameQuotation = <span class="hljs-string">"我们是一样一样滴."</span>
+<span class="hljs-keyword">if</span> quotation == sameQuotation {
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"这两个字符串被认为是相同的"</span>)
+}
+<span class="hljs-comment">// 打印输出："这两个字符串被认为是相同的"</span>
+</code></pre>
+<p><a name="prefix_and_suffix_equality"></a></p>
+<h3 id="-prefix-and-suffix-equality">前缀/后缀相等 (Prefix and Suffix Equality)</h3>
+<p>通过调用字符串的<code>hasPrefix</code>/<code>hasSuffix</code>方法来检查字符串是否拥有特定前缀/后缀。
+两个方法均需要以字符串作为参数传入并传出<code>Boolean</code>值。
+两个方法均执行基本字符串和前缀/后缀字符串之间逐个字符的比较操作。</p>
+<p>下面的例子以一个字符串数组表示莎士比亚话剧《罗密欧与朱丽叶》中前两场的场景位置：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> romeoAndJuliet = [
+    <span class="hljs-string">"Act 1 Scene 1: Verona, A public place"</span>,
+    <span class="hljs-string">"Act 1 Scene 2: Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 1 Scene 3: A room in Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 1 Scene 4: A street outside Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 1 Scene 5: The Great Hall in Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 2 Scene 1: Outside Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 2 Scene 2: Capulet's orchard"</span>,
+    <span class="hljs-string">"Act 2 Scene 3: Outside Friar Lawrence's cell"</span>,
+    <span class="hljs-string">"Act 2 Scene 4: A street in Verona"</span>,
+    <span class="hljs-string">"Act 2 Scene 5: Capulet's mansion"</span>,
+    <span class="hljs-string">"Act 2 Scene 6: Friar Lawrence's cell"</span>
+]
+</code></pre>
+<p>您可以利用<code>hasPrefix</code>方法来计算话剧中第一幕的场景数：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> act1SceneCount = <span class="hljs-number">0</span>
+<span class="hljs-keyword">for</span> scene <span class="hljs-keyword">in</span> romeoAndJuliet {
+    <span class="hljs-keyword">if</span> scene.hasPrefix(<span class="hljs-string">"Act 1 "</span>) {
+        ++act1SceneCount
+    }
+}
+<span class="hljs-built_in">println</span>(<span class="hljs-string">"There are <span class="hljs-subst">\(act1SceneCount)</span> scenes in Act 1"</span>)
+<span class="hljs-comment">// 打印输出："There are 5 scenes in Act 1"</span>
+</code></pre>
+<p>相似地，您可以用<code>hasSuffix</code>方法来计算发生在不同地方的场景数：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">var</span> mansionCount = <span class="hljs-number">0</span>
+<span class="hljs-keyword">var</span> cellCount = <span class="hljs-number">0</span>
+<span class="hljs-keyword">for</span> scene <span class="hljs-keyword">in</span> romeoAndJuliet {
+    <span class="hljs-keyword">if</span> scene.hasSuffix(<span class="hljs-string">"Capulet's mansion"</span>) {
+        ++mansionCount
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> scene.hasSuffix(<span class="hljs-string">"Friar Lawrence's cell"</span>) {
+        ++cellCount
+    }
+}
+<span class="hljs-built_in">println</span>(<span class="hljs-string">"<span class="hljs-subst">\(mansionCount)</span> mansion scenes; <span class="hljs-subst">\(cellCount)</span> cell scenes"</span>)
+<span class="hljs-comment">// 打印输出："6 mansion scenes; 2 cell scenes”</span>
+</code></pre>
+<p><a name="uppercase_and_lowercase_strings"></a></p>
+<h3 id="uppercase-and-lowercase-strings">大写和小写字符串（Uppercase and Lowercase Strings）</h3>
+<p>您可以通过字符串的<code>uppercaseString</code>和<code>lowercaseString</code>属性来访问大写/小写版本的字符串。</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">import</span> <span class="hljs-type">Foundation</span>
+
+<span class="hljs-keyword">let</span> normal = <span class="hljs-string">"Could you help me, please?"</span>
+<span class="hljs-keyword">let</span> shouty = normal.uppercaseString
+<span class="hljs-comment">// shouty 值为 "COULD YOU HELP ME, PLEASE?"</span>
+<span class="hljs-keyword">let</span> whispered = normal.lowercaseString
+<span class="hljs-comment">// whispered 值为 "could you help me, please?"</span>
+</code></pre>
+<p><a name="unicode"></a></p>
+<h2 id="unicode">Unicode</h2>
+<p>Unicode 是一个国际标准，用于文本的编码和表示。
+它使您可以用标准格式表示来自任意语言几乎所有的字符，并能够对文本文件或网页这样的外部资源中的字符进行读写操作。</p>
+<p>Swift 的字符串和字符类型是完全兼容 Unicode 标准的，它支持如下所述的一系列不同的 Unicode 编码。</p>
+<p><a name="unicode_terminology"></a></p>
+<h3 id="unicode-unicode-terminology">Unicode 术语（Unicode Terminology）</h3>
+<p>Unicode 中每一个字符都可以被解释为一个或多个 unicode 标量。
+字符的 unicode 标量是一个唯一的21位数字(和名称)，例如<code>U+0061</code>表示小写的拉丁字母A (&quot;a&quot;)，<code>U+1F425</code>表示小鸡表情 (&quot;🐥&quot;)</p>
+<p>当 Unicode 字符串被写进文本文件或其他存储结构当中，这些 unicode 标量将会按照 Unicode 定义的集中格式之一进行编码。其包括<code>UTF-8</code>（以8位代码单元进行编码） 和<code>UTF-16</code>（以16位代码单元进行编码）。</p>
+<p><a name="unicode_representations_of_strings"></a></p>
+<h3 id="-unicode-unicode-representations-of-strings">字符串的 Unicode 表示（Unicode Representations of Strings）</h3>
+<p>Swift 提供了几种不同的方式来访问字符串的 Unicode 表示。</p>
+<p>您可以利用<code>for-in</code>来对字符串进行遍历，从而以 Unicode 字符的方式访问每一个字符值。
+该过程在 <a href="#working_with_characters">使用字符</a> 中进行了描述。</p>
+<p>另外，能够以其他三种 Unicode 兼容的方式访问字符串的值：</p>
+<ul>
+<li>UTF-8 代码单元集合 (利用字符串的<code>utf8</code>属性进行访问)</li>
+<li>UTF-16 代码单元集合 (利用字符串的<code>utf16</code>属性进行访问)</li>
+<li>21位的 Unicode 标量值集合 (利用字符串的<code>unicodeScalars</code>属性进行访问)</li>
+</ul>
+<p>下面由<code>D``o``g``!</code>和<code>🐶</code>(<code>DOG FACE</code>，Unicode 标量为<code>U+1F436</code>)组成的字符串中的每一个字符代表着一种不同的表示：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">let</span> dogString = <span class="hljs-string">"Dog!🐶"</span>
+</code></pre>
+<p><a name="UTF-8"></a></p>
+<h3 id="utf-8">UTF-8</h3>
+<p>您可以通过遍历字符串的<code>utf8</code>属性来访问它的<code>UTF-8</code>表示。
+其为<code>UTF8View</code>类型的属性，<code>UTF8View</code>是无符号8位 (<code>UInt8</code>) 值的集合，每一个<code>UInt8</code>值都是一个字符的 UTF-8 表示：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">for</span> codeUnit <span class="hljs-keyword">in</span> dogString.utf8 {
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"<span class="hljs-subst">\(codeUnit)</span> "</span>)
+}
+<span class="hljs-built_in">print</span>(<span class="hljs-string">"\n"</span>)
+<span class="hljs-comment">// 68 111 103 33 240 159 144 182</span>
+</code></pre>
+<p>上面的例子中，前四个10进制代码单元值 (68, 111, 103, 33) 代表了字符<code>D</code> <code>o</code> <code>g</code>和<code>!</code>，它们的 UTF-8 表示与 ASCII 表示相同。
+后四个代码单元值 (240, 159, 144, 182) 是<code>DOG FACE</code>的4字节 UTF-8 表示。</p>
+<p><a name="UTF-16"></a></p>
+<h3 id="utf-16">UTF-16</h3>
+<p>您可以通过遍历字符串的<code>utf16</code>属性来访问它的<code>UTF-16</code>表示。
+其为<code>UTF16View</code>类型的属性，<code>UTF16View</code>是无符号16位 (<code>UInt16</code>) 值的集合，每一个<code>UInt16</code>都是一个字符的 UTF-16 表示：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">for</span> codeUnit <span class="hljs-keyword">in</span> dogString.utf16 {
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"<span class="hljs-subst">\(codeUnit)</span> "</span>)
+}
+<span class="hljs-built_in">print</span>(<span class="hljs-string">"\n"</span>)
+<span class="hljs-comment">// 68 111 103 33 55357 56374</span>
+</code></pre>
+<p>同样，前四个代码单元值 (68, 111, 103, 33) 代表了字符<code>D</code> <code>o</code> <code>g</code>和<code>!</code>，它们的 UTF-16 代码单元和 UTF-8 完全相同。</p>
+<p>第五和第六个代码单元值 (55357 和 56374) 是<code>DOG FACE</code>字符的UTF-16 表示。
+第一个值为<code>U+D83D</code>(十进制值为 55357)，第二个值为<code>U+DC36</code>(十进制值为 56374)。</p>
+<p><a name="unicode_scalars"></a></p>
+<h3 id="unicode--unicode-scalars">Unicode 标量 (Unicode Scalars)</h3>
+<p>您可以通过遍历字符串的<code>unicodeScalars</code>属性来访问它的 Unicode 标量表示。
+其为<code>UnicodeScalarView</code>类型的属性， <code>UnicodeScalarView</code>是<code>UnicodeScalar</code>的集合。
+<code>UnicodeScalar</code>是21位的 Unicode 代码点。</p>
+<p>每一个<code>UnicodeScalar</code>拥有一个值属性，可以返回对应的21位数值，用<code>UInt32</code>来表示。</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">for</span> scalar <span class="hljs-keyword">in</span> dogString.unicodeScalars {
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"<span class="hljs-subst">\(scalar.value)</span> "</span>)
+}
+<span class="hljs-built_in">print</span>(<span class="hljs-string">"\n"</span>)
+<span class="hljs-comment">// 68 111 103 33 128054</span>
+</code></pre>
+<p>同样，前四个代码单元值 (68, 111, 103, 33) 代表了字符<code>D</code> <code>o</code> <code>g</code>和<code>!</code>。
+第五位数值，128054，是一个十六进制1F436的十进制表示。
+其等同于<code>DOG FACE</code>的Unicode 标量 U+1F436。</p>
+<p>作为查询字符值属性的一种替代方法，每个<code>UnicodeScalar</code>值也可以用来构建一个新的字符串值，比如在字符串插值中使用：</p>
+<pre><code class="lang-swift"><span class="hljs-keyword">for</span> scalar <span class="hljs-keyword">in</span> dogString.unicodeScalars {
+    <span class="hljs-built_in">println</span>(<span class="hljs-string">"<span class="hljs-subst">\(scalar)</span> "</span>)
+}
+<span class="hljs-comment">// D</span>
+<span class="hljs-comment">// o</span>
+<span class="hljs-comment">// g</span>
+<span class="hljs-comment">// !</span>
+<span class="hljs-comment">// 🐶</span>
+</code></pre>
+
+                    
+                    </section>
+                
+                
+                </div>
+            </div>
+        </div>
+
+        
+        <a href="../chapter2/02_Basic_Operators.html" class="navigation navigation-prev " aria-label="Previous page: 基本运算符"><i class="fa fa-angle-left"></i></a>
+        
+        
+        <a href="../chapter2/04_Collection_Types.html" class="navigation navigation-next " aria-label="Next page: 集合类型"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+<script src="../gitbook/app.js"></script>
+
+    
+    <script src="https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2}};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
+</html>
