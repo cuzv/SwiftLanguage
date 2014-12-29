@@ -43,7 +43,9 @@
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	
-	[self.webView stopLoading];
+	if (self.webView.isLoading) {
+		[self.webView stopLoading];
+	}
 }
 
 - (void)customUserInterface {
@@ -73,19 +75,38 @@
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	
-	UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:[error localizedDescription] preferredStyle:UIAlertControllerStyleAlert];
+	NSString *errorURLString = error.userInfo[@"NSErrorFailingURLStringKey"];
+	NSString *errorMessage = [error localizedDescription];
+	if (errorURLString) {
+		errorMessage = [errorMessage stringByAppendingFormat:@"\nErrorURLString: %@", errorURLString];
+	}
+	
+	UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
 	UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleCancel handler:nil];
 	[alert addAction:cancel];
-	[self presentViewController:alert animated:YES completion:nil];
+	[self.navigationController presentViewController:alert animated:YES completion:nil];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
 	if (navigationType == UIWebViewNavigationTypeLinkClicked) {
 		
 		NSString *requestURLString  = [request.URL absoluteString];
+		if ([requestURLString hasPrefix:@"http"]) {
+			return YES;
+		}
+		
 		NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
 		if ([requestURLString rangeOfString:resourcePath].location == NSNotFound) {
 			NSString *last = [requestURLString lastPathComponent];
+			
+			NSRange chapterRange = [requestURLString rangeOfString:@"chapter"];
+			if (chapterRange.location != NSNotFound) {
+				NSUInteger location = chapterRange.location + chapterRange.length;
+				NSString *chapterString = [requestURLString substringWithRange:NSMakeRange(location, 1)];
+				last = [chapterString stringByAppendingString:last];
+			}
+			
+			
 			NSString *newRequestString = [resourcePath stringByAppendingPathComponent:last];
 			newRequestString = [@"file://" stringByAppendingString:newRequestString];
 			
