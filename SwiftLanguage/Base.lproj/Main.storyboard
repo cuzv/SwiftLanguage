@@ -19,11 +19,26 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="V9J-Ck-XSc">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <searchBar key="tableHeaderView" contentMode="redraw" id="D4M-9V-r6R">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <textInputTraits key="textInputTraits"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="FaL-2o-39e" id="F7b-A3-1m0"/>
+                                    </connections>
+                                </searchBar>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CatalogCell" id="g2j-QG-hUY">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="g2j-QG-hUY" id="hJK-5r-BRc">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SearchCell" id="qop-d5-obA">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qop-d5-obA" id="u1b-46-8tL">
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -54,12 +69,22 @@
                     </view>
                     <navigationItem key="navigationItem" id="b7l-Nf-S8c"/>
                     <connections>
+                        <outlet property="searchBar" destination="D4M-9V-r6R" id="Vt8-qX-liU"/>
+                        <outlet property="searchDisplayController" destination="3fr-MB-r5g" id="kok-YM-eux"/>
                         <outlet property="statusBar" destination="5Ud-LF-epB" id="uxb-fm-Fgn"/>
                         <outlet property="tableView" destination="V9J-Ck-XSc" id="UYb-7e-zlO"/>
                         <segue destination="vXZ-lx-hvc" kind="show" identifier="ShowDetail" id="KOV-di-cZu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qNW-Oa-QdD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="3fr-MB-r5g">
+                    <connections>
+                        <outlet property="delegate" destination="FaL-2o-39e" id="Uyz-7u-xpS"/>
+                        <outlet property="searchContentsController" destination="FaL-2o-39e" id="SCK-mq-TkP"/>
+                        <outlet property="searchResultsDataSource" destination="FaL-2o-39e" id="3V6-lA-l4j"/>
+                        <outlet property="searchResultsDelegate" destination="FaL-2o-39e" id="qaK-tc-2Lo"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="980" y="241"/>
         </scene>
