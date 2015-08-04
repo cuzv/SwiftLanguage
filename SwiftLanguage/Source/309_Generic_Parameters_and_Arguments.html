@@ -1,0 +1,71 @@
+<meta http-equiv=Content-Type content="text/html;charset=utf-8">
+
+<blockquote>
+<p>1.0 翻译：<a href="https://github.com/fd5788">fd5788</a> 校对：<a href="https://github.com/yankuangshi">yankuangshi</a>, <a href="https://github.com/stanzhai">stanzhai</a></p>
+</blockquote>
+<blockquote>
+<p>2.0 翻译+校对：<a href="https:github.com/wardenNScaiyi">wardenNScaiyi</a></p>
+</blockquote>
+<h2 id="泛型参数"># 泛型参数</h2>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#generic_parameter">泛型形参子句</a></li>
+<li><a href="#generic_argument">泛型实参子句</a></li>
+</ul>
+<p>本节涉及泛型类型、泛型函数以及泛型初始化器（<strong>initializer</strong>）的参数，包括形参和实参。声明泛型类型、函数或初始化器时，须指定相应的类型参数。类型参数相当于一个占位符，当实例化泛型类型、调用泛型函数或泛型初始化器时，就用具体的类型实参替代之。</p>
+<p>关于 Swift 语言的泛型概述，见<a href="../chapter2/23_Generics.md">泛型</a>(第二部分第23章)。</p>
+<p><a name="generic_parameter"></a></p>
+<h2 id="泛型形参子句">泛型形参子句</h2>
+<p>泛型形参子句指定泛型类型或函数的类型形参，以及这些参数的关联约束和关联类型要求（<strong>requirement</strong>）。泛型形参子句用尖括号（&lt;&gt;）包住，并且有以下两种形式：</p>
+<blockquote>
+<p>&lt;<code>泛型形参列表</code>&gt;<br />&lt;<code>泛型形参列表</code> where <code>关联类型要求</code>&gt;</p>
+</blockquote>
+<p>泛型形参列表中泛型形参用逗号分开，其中每一个采用以下形式：</p>
+<blockquote>
+<p><code>类型形参</code> : <code>约束</code></p>
+</blockquote>
+<p>泛型形参由两部分组成：类型形参及其后的可选约束。类型形参只是占位符类型（如 T，U，V，Key，Value 等）的名字而已。你可以在泛型类型、函数的其余部分或者初始化器声明，包括函数或初始化器的签名中使用它（与其任何相关类型）。</p>
+<p>约束用于指明该类型形参继承自某个类或者遵守某个协议或协议的一部分。例如，在下面的泛型函数中，泛型形参<code>T: Comparable</code>表示任何用于替代类型形参<code>T</code>的类型实参必须满足<code>Comparable</code>协议。</p>
+<pre class="swift"><code>func simpleMax&lt;T: Comparable&gt;(x: T, _ y: T) -&gt; T {
+    if x &lt; y {
+        return y
+    }
+    return x
+}</code></pre>
+<p>如，<code>Int</code>和<code>Double</code>均满足<code>Comparable</code>协议，该函数接受任何一种类型。与泛型类型相反，调用泛型函数或初始化器时不需要指定泛型实参子句。类型实参由传递给函数或初始化器的实参推断而出。</p>
+<pre><code>simpleMax(17, 42) // T被推断出为Int类型
+simpleMax(3.14159, 2.71828) // T被推断出为Double类型</code></pre>
+<h2 id="where-子句">Where 子句</h2>
+<p>要想对类型形参及其关联类型指定额外关联类型要求，可以在泛型形参列表之后添加<code>where</code>子句。<code>where</code>子句由关键字<code>where</code>及其后的用逗号分割的多个关联类型要求组成。</p>
+<p><code>where</code>子句中的关联关系用于指明该类型形参继承自某个类或遵守某个协议或协议的一部分。尽管<code>where</code>子句提供了语法糖使其有助于表达类型形参上的简单约束（如<code>T: Comparable</code>等同于<code>T where T: Comparable</code>，等等），但是依然可以用来对类型形参及其关联类型提供更复杂的约束。如，<code>&lt;T where T: C, T: P&gt;</code>表示泛型类型<code>T</code>继承自类<code>C</code>且遵守协议<code>P</code>。</p>
+<p>如上所述，可以强制约束类型形参的关联类型遵守某个协议。例如<code>&lt;T: Generator where T.Element: Equatable&gt;</code>表示<code>T</code>遵守<code>Generator</code>协议，而且<code>T</code>的关联类型<code>T.Element</code>遵守<code>Eauatable</code>协议（<code>T</code>有关联类型<code>Element</code>是因为<code>Generator</code>声明了<code>Element</code>，而<code>T</code>遵守<code>Generator</code>协议）。</p>
+<p>也可以用操作符<code>==</code>来指定两个类型等效的关联关系。例如，有这样一个约束：<code>T</code>和<code>U</code>遵守<code>Generator</code>协议，同时要求它们的关联类型等同，可以这样来表达：<code>&lt;T: Generator, U: Generator where T.Element == U.Element&gt;</code>。</p>
+<p>当然，替代类型形参的类型实参必须满足所有类型形参的约束和关联类型要求。</p>
+<p>泛型函数或初始化器可以重载，但在泛型形参子句中的类型形参必须有不同的约束或关联类型要求，抑或二者皆不同。当调用重载的泛型函数或始化器时，编译器会用这些约束来决定调用哪个重载函数或始化器。</p>
+<blockquote>
+<p>泛型形参子句语法<br /><em>泛型参数子句</em> → <strong>&lt;</strong> <a href="GenericParametersAndArguments.html#generic_parameter_list"><em>泛型参数列表</em></a> <a href="GenericParametersAndArguments.html#requirement_clause"><em>约束子句</em></a> <em>可选</em> <strong>&gt;</strong><br /><em>泛型参数列表</em> → <a href="GenericParametersAndArguments.html#generic_parameter"><em>泛形参数</em></a> | <a href="GenericParametersAndArguments.html#generic_parameter"><em>泛形参数</em></a> <strong>,</strong> <a href="GenericParametersAndArguments.html#generic_parameter_list"><em>泛型参数列表</em></a><br /><em>泛形参数</em> → <a href="../chapter3/03_Types.html#type_name"><em>类型名称</em></a><br /><em>泛形参数</em> → <a href="../chapter3/03_Types.html#type_name"><em>类型名称</em></a> <strong>:</strong> <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a><br /><em>泛形参数</em> → <a href="../chapter3/03_Types.html#type_name"><em>类型名称</em></a> <strong>:</strong> <a href="../chapter3/03_Types.html#protocol_composition_type"><em>协议合成类型</em></a><br /><em>约束子句</em> → <strong>where</strong> <a href="GenericParametersAndArguments.html#requirement_list"><em>约束列表</em></a><br /><em>约束列表</em> → <a href="GenericParametersAndArguments.html#requirement"><em>约束</em></a> | <a href="GenericParametersAndArguments.html#requirement"><em>约束</em></a> <strong>,</strong> <a href="GenericParametersAndArguments.html#requirement_list"><em>约束列表</em></a><br /><em>约束</em> → <a href="GenericParametersAndArguments.html#conformance_requirement"><em>一致性约束</em></a> | <a href="GenericParametersAndArguments.html#same_type_requirement"><em>同类型约束</em></a><br /><em>一致性约束</em> → <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a> <strong>:</strong> <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a><br /><em>一致性约束</em> → <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a> <strong>:</strong> <a href="../chapter3/03_Types.html#protocol_composition_type"><em>协议合成类型</em></a><br /><em>同类型约束</em> → <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a> <strong>==</strong> <a href="../chapter3/03_Types.html#type_identifier"><em>类型标识</em></a></p>
+</blockquote>
+<p><a name="generic_argument"></a></p>
+<h2 id="泛型实参子句">泛型实参子句</h2>
+<p>泛型实参子句指定_泛型类型_的类型实参。泛型实参子句用尖括号（&lt;&gt;）包住，形式如下：</p>
+<blockquote>
+<p>&lt;<code>泛型实参列表</code>&gt;</p>
+</blockquote>
+<p>泛型实参列表中类型实参有逗号分开。类型实参是实际具体类型的名字，用来替代泛型类型的泛型形参子句中的相应的类型形参。从而得到泛型类型的一个特化版本。如，Swift标准库的泛型字典类型定义如下：</p>
+<pre class="swift"><code>struct Dictionary&lt;KeyTypel: Hashable, ValueType&gt;: Collection, DictionaryLiteralConvertible {
+
+    /* .. */
+
+}</code></pre>
+<p>泛型<code>Dictionary</code>类型的特化版本，<code>Dictionary&lt;String, Int&gt;</code>就是用具体的<code>String</code>和<code>Int</code>类型替代泛型类型<code>KeyType: Hashable</code>和<code>ValueType</code>产生的。每一个类型实参必须满足它所替代的泛型形参的所有约束，包括任何<code>where</code>子句所指定的额外的关联类型要求。上面的例子中，类型形参<code>Key</code>类型要求满足<code>Hashable</code>协议，因此<code>String</code>也必须满足<code>Hashable</code>协议。</p>
+<p>可以用本身就是泛型类型的特化版本的类型实参替代类型形参（假设已满足合适的约束和关联类型要求）。例如，为了生成一个元素类型是整型数组的数组，可以用数组的特化版本<code>Array&lt;Int&gt;</code>替代泛型类型<code>Array&lt;T&gt;</code>的类型形参 <code>T</code> 来实现。</p>
+<pre><code>let arrayOfArrays: Array&lt;Array&lt;Int&gt;&gt; = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]</code></pre>
+<p>如<a href="#generic_parameter">泛型形参子句</a>所述，不能用泛型实参子句来指定泛型函数或初始化器的类型实参。</p>
+<blockquote>
+<p>泛型实参子句语法<br /><em>(泛型参数子句Generic Argument Clause)</em> → <strong>&lt;</strong> <a href="GenericParametersAndArguments.html#generic_argument_list"><em>泛型参数列表</em></a> <strong>&gt;</strong><br /><em>泛型参数列表</em> → <a href="GenericParametersAndArguments.html#generic_argument"><em>泛型参数</em></a> | <a href="GenericParametersAndArguments.html#generic_argument"><em>泛型参数</em></a> <strong>,</strong> <a href="GenericParametersAndArguments.html#generic_argument_list"><em>泛型参数列表</em></a><br /><em>泛型参数</em> → <a href="../chapter3/03_Types.html#type"><em>类型</em></a></p>
+</blockquote>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+

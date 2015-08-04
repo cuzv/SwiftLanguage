@@ -1,0 +1,161 @@
+<meta http-equiv=Content-Type content="text/html;charset=utf-8">
+
+<blockquote>
+<p>1.0 翻译：<a href="https://github.com/Hawstein">Hawstein</a> 校对：<a href="https://github.com/numbbbbb">numbbbbb</a>, <a href="https://github.com/stanzhai">stanzhai</a></p>
+</blockquote>
+<blockquote>
+<p>2.0 翻译+校对：<a href="https://github.com/KYawn">KYawn</a></p>
+</blockquote>
+<h2 id="特性"># 特性</h2>
+<p>本页内容包括：</p>
+<ul>
+<li><a href="#declaration_attributes">声明特性</a></li>
+<li><a href="#type_attributes">类型特性</a></li>
+</ul>
+<p>特性提供了关于声明和类型的更多信息。在Swift中有两类特性，用于修饰声明的以及用于修饰类型的。</p>
+<p>通过以下方式指定一个特性：符号<code>@</code>后面跟特性名，如果包含参数，则把参数带上：</p>
+<blockquote>
+<p>@<code>attribute name</code><br />@<code>attribute name</code>(<code>attribute arguments</code>)</p>
+</blockquote>
+<p>有些声明特性通过接收参数来指定特性的更多信息以及它是如何修饰一个特定的声明的。这些特性的参数写在小括号内，它们的格式由它们所属的特性来定义。</p>
+<p><a name="declaration_attributes"></a></p>
+<h2 id="声明特性">声明特性</h2>
+<p>声明特性只能应用于声明。然而，你也可以将<code>noreturn</code>特性应用于函数或方法类型。</p>
+<p><code>autoclosure</code></p>
+<p>这个特性通过把表达式自动封装成无参数的闭包来延迟表达式的计算。它可以声明返回表达式自身类型的没有参数的方法类型，也可以用于函数参数的声明。含有<code>autoclosure</code>特性的声明同时也具有<code>noescape</code>的特性，除非传递可选参数<code>escaping</code>.关于怎样使用<code>autoclosure</code>特性的例子，参见<a href="./03_Types.html#function_type">函数类型</a>.</p>
+<p><code>available</code></p>
+<p>将<code>available</code>特性用于声明时，意味着该声明的生命周期会依赖于特定的平台和操作系统版本。</p>
+<p><code>available</code>特性经常与参数列表一同出现，该参数列表至少有两个参数，参数之间由逗号分隔。这些参数由以下这些平台名字中的一个起头：</p>
+<ul>
+<li><code>iOS</code></li>
+<li><code>iOSApplicationExtension</code></li>
+<li><code>OSX</code></li>
+<li><code>OSXApplicationExtension</code></li>
+<li><code>watchOS</code></li>
+</ul>
+<p>当然，你也可以用一个星号(*)来表示，该声明在上面提到的所有平台上都是有效的。</p>
+<p>剩下的参数，可以以任何顺序出现，并且可以添加关于声明生命周期的附加信息，包括重要的里程碑。</p>
+<ul>
+<li><p><code>unavailable</code>参数表示：该声明在特定的平台上是无效的</p></li>
+<li><code>introduced</code>参数表示：该声明第一次被引入时所在平台的版本。格式如下：
+<p>
+<code>introduced=version number</code>
+<p>
+<p>这里的<code>version number</code>由一个正的十进制整数或浮点数构成。</p></li>
+<li><code>deprecated</code>参数表示：该声明第一次被建议弃用时所在平台的版本。格式如下：
+<p>
+<code>deprecated=version number</code>
+<p>
+<p>这里的<code>version number</code>由一个正的十进制整数或浮点数构成。</p></li>
+<li><code>obsoleted</code>参数表示：该声明第一次被弃用时所在平台的版本。当一个声明被弃用时，它就从此平台中被移除，不能再被使用。格式如下：
+<p>
+<code>obsoleted=version number</code>
+<p>
+<p>这里的<code>version number</code>由一个正的十进制整数或浮点数构成。</p></li>
+<li><code>message</code>参数用来提供文本信息。当使用建议弃用或者被弃用的声明时，编译器会抛出错误或警告信息。格式如下：
+<p>
+<code>message=message</code>
+<p>
+<p>这里的<code>message</code>由一个字符串文字构成。</p></li>
+<li><code>renamed</code>参数用来提供文本信息，用以表示被重命名的声明的新名字。当使用这个重命名的声明遇到错误时，编译器会显示出该新名字。格式如下：
+<p>
+<code>renamed=new name</code>
+<p>
+<p>这里的<code>new name</code>由一个字符串文字构成。</p></li>
+</ul>
+<p>你可以将<code>renamed</code>参数和<code>unavailable</code>参数以及类型别名声明组合使用，以向用户表示：在你的代码中，一个声明已经被重命名。当一个声明的名字在一个框架或者库的不同发布版本间发生变化时，这会相当有用。</p>
+<pre class="swift"><code>// First release
+protocol MyProtocol {
+    // protocol definition
+}
+// Subsequent release renames MyProtocol
+protocol MyRenamedProtocol {
+    // protocol definition
+}
+ 
+@available(*, unavailable, renamed=&quot;MyRenamedProtocol&quot;)
+typealias MyProtocol = MyRenamedProtocol</code></pre>
+<p>你可以在一个单独的声明上使用多个<code>available</code>特性，以详细说明该声明在不同平台上的有效性。编译器只有在当前的目标平台和<code>available</code>特性中指定的平台匹配时，才会使用<code>available</code>特性</p>
+<p>如果<code>available</code>特性除了平台名称参数外，只指定了一个<code>introduced</code>参数，那么可以使用以下简写语法代替：</p>
+<p><span class="citation">@available</span>(<code>platform name</code> <code>version number</code>, *)</p>
+<p><code>available</code>特性的简写语法可以简明地表达出多个平台的可用性。尽管这两种形式在功能上是相同的，但请尽可能地使用简明语法形式。</p>
+<pre class="swift"><code>@available(iOS 8.0, OSX 10.10, *)
+class MyClass {
+    // class definition
+}</code></pre>
+<p><code>objc</code></p>
+<p>该特性用于修饰任何可以在Objective-C中表示的声明。比如，非嵌套类、协议、非泛型枚举（仅限整型值类型）、类和协议的属性和方法（包括<code>getter</code>和<code>setter</code>）、构造器、析构器以及下标。<code>objc</code>特性告诉编译器这个声明可以在Objective-C代码中使用。</p>
+<p>标有<code>objc</code>特性的类必须继承自Objective-C中定义的类。如果你将<code>objc</code>特性应用于一个类或协议，它也会隐式地应用于那个类的成员或协议。对于标记了<code>objc</code>特性的类，编译器会隐式地为它的子类添加<code>objc</code>特性。标记了<code>objc</code>特性的协议不能继承没有标记<code>objc</code>的协议。</p>
+<p>如果你将<code>objc</code>特性应用于枚举，每一个枚举的<code>case</code>都会以枚举名称和<code>case</code>名称组合的方式暴露在Objective-C代码中。例如：一个名为<code>Venus</code>的<code>case</code>在<code>Planet</code>枚举中，这个<code>case</code>暴露在Objective-C代码中时叫做<code>PlanetVenus</code>。</p>
+<p><code>objc</code>特性有一个可选的参数，由标记符组成。当你想把<code>objc</code>所修饰的实体以一个不同的名字暴露给Objective-C时，你就可以使用这个特性参数。你可以使用这个参数来命名类，协议，方法，getters，setters，以及构造器。下面的例子把<code>ExampleClass</code>中<code>enabled</code>属性的getter暴露给Objective-C，名字是<code>isEnabled</code>，而不是它原来的属性名。</p>
+<pre class="swift"><code>@objc
+class ExampleClass {
+    var enabled: Bool {
+    @objc(isEnabled) get {
+        // Return the appropriate value
+    }
+    }
+}</code></pre>
+<p><code>noescape</code></p>
+<p>在函数或者方法声明上使用该特性，它表示参数将不会被存储用作后续的计算，其用来确保不会超出函数调用的生命周期。对于其属性或方法来说，使用<code>noescape</code>声明属性的函数类型不需要显式的使用<code>self.</code>。</p>
+<p><code>nonobjc</code></p>
+<p>该特性用于方法、属性、下标、或构造器的声明，这些声明本是可以在Objective-C代码中表示的。使用<code>nonobjc</code>特性告诉编译器这个声明不能在Objective-C代码中使用。</p>
+<p>可以使用<code>nonobjc</code>特性解决标有<code>objc</code>的类中桥接方法的循环问题，该特性还允许标有<code>objc</code>的类的构造器和方法进行重载(overload)。</p>
+<p>标有<code>nonobjc</code>特性的方法不能重写(override)一个标有<code>objc</code>特性的方法。然而，标有<code>objc</code>特性的方法可以重写标有<code>nonobjc</code>特性的方法。同样，标有<code>nonobjc</code>特性的方法不能满足一个需要标有<code>@objc</code>特性的方法的协议。</p>
+<p><code>noreturn</code></p>
+<p>该特性用于修饰函数或方法声明，表明该函数或方法的对应类型，<code>T</code>，是<code>@noreturn T</code>。你可以用这个特性修饰函数或方法的类型，这样一来，函数或方法就不会返回到它的调用者中去。</p>
+<p>对于一个没有用<code>noreturn</code>特性标记的函数或方法，你可以将它重写为用该特性标记的。相反，对于一个已经用<code>noreturn</code>特性标记的函数或方法，你则不可以将它重写为没使用该特性标记的。当你在一个comforming类型中实现一个协议方法时，该规则同样适用。</p>
+<p><code>NSApplicationMain</code></p>
+<p>在类上使用该特性表示该类是应用程序委托类，使用该特性与调用<code>NSApplicationMain(_:_:)</code>函数并且把该类的名字作为委托类的名字传递给函数的效果相同。</p>
+<p>如果你不想使用这个特性，可以提供一个<code>main.swift</code>文件，并且提供一个<code>main</code>函数去调用<code>NSApplicationMain(_:_:)</code>函数。比如，如果你的应用程序使用一个派生于<code>NSApplication</code>的自定义子类作为主要类，你可以调用<code>NSApplicationMain</code>函数而不是使用该特性。</p>
+<p><code>NSCopying</code></p>
+<p>该特性用于修饰一个类的存储型变量属性。该特性将使属性的setter与属性值的一个副本合成，这个值由<code>copyWithZone(_:)</code>方法返回，而不是属性本身的值。该属性的类型必需遵循<code>NSCopying</code>协议。</p>
+<p><code>NSCopying</code>特性的原理与Objective-C中的<code>copy</code>特性相似。</p>
+<p><code>NSManaged</code></p>
+<p>该特性用于修饰<code>NSManagedObject</code>子类中的存储型变量属性，表明属性的存储和实现由Core Data在运行时基于相关实体描述动态提供。</p>
+<p><code>testable</code></p>
+<p>该特性用于<code>import</code>声明可以测试的编译模块，它能访问任何标有<code>internal</code>权限标识符的实体，这和将它声明为<code>public</code>权限标识符有同样的效果。</p>
+<p><code>UIApplicationMain</code></p>
+<p>在类上使用该特性表示该类是应用程序委托类，使用该特性与调用<code>UIApplicationMain(_:_:)</code>函数并且把该类的名字作为委托类的名字传递给函数的效果相同。</p>
+<p>如果你不想使用这个特性，可以提供一个<code>main.swift</code>文件，并且提供一个<code>main</code>函数去调用<code>UIApplicationMain(_:_:)</code>函数。比如，如果你的应用程序使用一个派生于<code>UIApplication</code>的自定义子类作为主要类，你可以调用<code>UIApplicationMain</code>函数而不是使用该特性。</p>
+<p><code>warn_unused_result</code></p>
+<p>该特性应用于方法或函数声明，当方法或函数被调用，但其结果未被使用时，该特性会让编译器会产生警告。</p>
+<p>你可以使用这个特性提供一个警告信息，这个警告信息是关于不正确地使用未变异的方法的，这个方法也有一个对应的变异方法。</p>
+<p><code>warn_unused_result</code>有下面两个可选的参数。</p>
+<ul>
+<li><code>message</code>参数用来提供警告信息，并在因当方法或函数被调用，但其结果未被使用时，显示警告信息。格式如下：
+<p>
+<code>message=message</code>
+<p>
+<p>这里的<code>message</code>由一个字符串文字构成。</p></li>
+<li><code>mutable_variant</code>参数用于提供变异方法的名称，如果未变异方法以一个可变的值被调用而且其结果并未被使用时，应该使用此变异方法。格式如下（方法名有字符串构成）：
+<p>
+<code>mutable_variant=method name</code>
+<p></li>
+</ul>
+<p>比如，Swift标准库提供了变异方法<code>sortInPlace()</code>和未变异方法<code>sort()</code>集合，它们的元素生成器符合<code>Comparable</code>协议。如果你调用了<code>sort()</code>方法，而没有使用它的结果，很有可能，你打算使用变异方法<code>sortInPlace()</code>替代。</p>
+<h3 id="interface-builder使用的声明特性">Interface Builder使用的声明特性</h3>
+<p>Interface Builder特性是Interface Builder用来与Xcode同步的声明特性。Swift提供了以下的Interface Builder特性：<code>IBAction</code>，<code>IBDesignable</code>，<code>IBInspectable</code>，以及<code>IBOutlet</code>。这些特性与Objective-C中对应的特性在概念上是相同的。</p>
+<p><code>IBOutlet</code>和<code>IBInspectable</code>用于修饰一个类的属性声明；<code>IBAction</code>特性用于修饰一个类的方法声明；<code>IBDesignable</code>用于修饰类的声明。</p>
+<p><a name="type_attributes"></a></p>
+<h2 id="类型特性">类型特性</h2>
+<p>类型特性只能用于修饰类型。然而，你也可以用<code>noreturn</code>特性去修饰函数或方法声明。</p>
+<p><code>convention</code></p>
+<p>该特性用于函数的类型，它指出函数调用的约定。</p>
+<p><code>convention</code>特性有下面几个可选的参数。</p>
+<ul>
+<li><p><code>swift</code>参数用于表明一个Swift函数引用。这是Swift中标准的函数值调用约定。</p></li>
+<li><p><code>block</code>参数用于表明一个Objective-C兼容的块引用。函数值表示为一个块对象的引用，这是一个<code>id-</code>兼容的Objective-C对象，对象中嵌入了调用函数。调用函数使用C的调用约定。</p></li>
+<li><p><code>c</code>参数用于表明一个C函数引用。函数值没有上下文，这个函数也使用C的调用约定。</p></li>
+</ul>
+<p>使用C函数调用约定的函数也可用作使用Objective-C块调用约定的函数，同时使用Objective-C块调用约定的函数也可用作使用Swift函数调用约定的函数。然而，只有非泛型的全局函数和本地函数或者不使用任何本地变量的闭包可以被用作使用C函数调用约定的函数。</p>
+<p><code>noreturn</code></p>
+<p>该特性用于修饰函数或方法的类型，表明该函数或方法不会返回到它的调用者中去。你也可以用它标记函数或方法的声明，表示函数或方法的相应类型，<code>T</code>，是<code>@noreturn T</code>。</p>
+<blockquote>
+<p>特性语法 <em>特性</em> → <strong>@</strong> <a href="#attribute_name"><em>特性名</em></a> <a href="#attribute_argument_clause"><em>特性参数子句</em></a> <sub><em>可选</em></sub><br /><em>特性名</em> → <a href="02_Lexical_Structure.html#identifiers"><em>标识符</em></a><br /><em>特性参数子句</em> → <strong>(</strong> <a href="#balanced_tokens"><em>平衡令牌列表</em></a> <sub><em>可选</em></sub> <strong>)</strong><br /><em>特性(Attributes)列表</em> → <a href="#attribute"><em>特色</em></a> <a href="#attributes"><em>特性(Attributes)列表</em></a> <sub><em>可选</em></sub><br /><em>平衡令牌列表</em> → <a href="#balanced_token"><em>平衡令牌</em></a> <a href="#balanced_tokens"><em>平衡令牌列表</em></a> <sub><em>可选</em></sub><br /><em>平衡令牌</em> → <strong>(</strong> <a href="#balanced_tokens"><em>平衡令牌列表</em></a> <sub><em>可选</em></sub> <strong>)</strong><br /><em>平衡令牌</em> → <strong>[** <a href="#balanced_tokens"><em>平衡令牌列表</em></a> <sub><em>可选</em></sub> **]</strong><br /><em>平衡令牌</em> → <strong>{</strong> <a href="#balanced_tokens"><em>平衡令牌列表</em></a> <sub><em>可选</em></sub> <strong>}</strong><br /><em>平衡令牌</em> → <strong>任意标识符, 关键字, 字面量或运算符</strong><br /><em>平衡令牌</em> → <strong>任意标点除了(, ), [, ], {, 或 }</strong></p>
+</blockquote>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+

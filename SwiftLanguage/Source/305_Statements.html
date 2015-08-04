@@ -1,0 +1,268 @@
+<meta http-equiv=Content-Type content="text/html;charset=utf-8">
+
+<blockquote>
+<p>1.0 翻译：<a href="https://github.com/coverxit">coverxit</a> 校对：<a href="https://github.com/numbbbbb">numbbbbb</a>, <a href="https://github.com/coverxit">coverxit</a>, <a href="https://github.com/stanzhai">stanzhai</a>,</p>
+</blockquote>
+<blockquote>
+<p>2.0 翻译+校对：<a href="https://github.com/littledogboy">littledogboy</a></p>
+</blockquote>
+<p><a name="statement_statements"></a></p>
+<h2 id="语句"># 语句</h2>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#loop_statements">循环语句</a></li>
+<li><a href="#branch_statements">分支语句</a></li>
+<li><a href="#labeled_statement">带标签的语句</a></li>
+<li><a href="#control_transfer_statements">控制传递语句</a></li>
+</ul>
+<p>在 Swift 中，有两种类型的语句：简单语句和控制流语句。简单语句是最常见的，用于构造表达式或者声明。控制流语句则用于控制程序执行的流程，Swift 中有三种类型的控制流语句：循环语句、分支语句和控制传递语句。</p>
+<p>循环语句用于重复执行代码块；分支语句用于执行满足特定条件的代码块；控制传递语句则用于修改代码的执行顺序。在稍后的叙述中，将会详细地介绍每一种类型的控制流语句。</p>
+<p>是否将分号（<code>;</code>）添加到语句的结尾处是可选的。但若要在同一行内写多条独立语句，请务必使用分号。</p>
+<blockquote>
+<p>语句语法<br /><em>语句</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <strong>;</strong> <em>可选</em><br /><em>语句</em> → <a href="../chapter3/05_Declarations.html#declaration"><em>声明</em></a> <strong>;</strong> <em>可选</em><br /><em>语句</em> → <a href="../chapter3/10_Statements.html#loop_statement"><em>循环语句</em></a> <strong>;</strong> <em>可选</em><br /><em>语句</em> → <a href="../chapter3/10_Statements.html#branch_statement"><em>分支语句</em></a> <strong>;</strong> <em>可选</em><br /><em>语句</em> → <a href="../chapter3/10_Statements.html#labeled_statement"><em>标记语句(Labeled Statement)</em></a><br /><em>语句</em> → <a href="../chapter3/10_Statements.html#control_transfer_statement"><em>控制转移语句</em></a> <strong>;</strong> <em>可选</em><br /><em>语句</em> → <a href="../chapter3/10_Statements.html#control_transfer_statement"><em>XXX语句</em></a> <strong>;</strong> <em>可选</em><br /><em>多条语句(Statements)</em> → <a href="../chapter3/10_Statements.html#statement"><em>语句</em></a> <a href="../chapter3/10_Statements.html#statements"><em>多条语句(Statements)</em></a> <em>可选</em></p>
+</blockquote>
+<p><a name="loop_statements"></a></p>
+<h2 id="循环语句">循环语句</h2>
+<p>取决于特定的循环条件，循环语句允许重复执行代码块。Swift 提供四种类型的循环语句：<code>for</code>语句、<code>for-in</code>语句、<code>while</code>语句和<code>do-while</code>语句。</p>
+<p>通过<code>break</code>语句和<code>continue</code>语句可以改变循环语句的控制流。有关这两条语句，详情参见 <a href="#break_statement">Break 语句</a>和 <a href="#continue_statement">Continue 语句</a>。</p>
+<blockquote>
+<p>循环语句语法<br /><em>循环语句</em> → <a href="../chapter3/10_Statements.html#for_statement"><em>for语句</em></a><br /><em>循环语句</em> → <a href="../chapter3/10_Statements.html#for_in_statement"><em>for-in语句</em></a><br /><em>循环语句</em> → <a href="../chapter3/10_Statements.html#wheetatype类型ile_statement"><em>while语句</em></a><br /><em>循环语句</em> → <a href="../chapter3/10_Statements.html#do_while_statement"><em>do-while语句</em></a></p>
+</blockquote>
+<p><a name="for_statements"></a></p>
+<h3 id="for-语句">For 语句</h3>
+<p><code>for</code>语句只有在循环条件为真时重复执行代码块，此时计数器递增。</p>
+<p><code>for</code>语句的形式如下：</p>
+<blockquote>
+<p>for <code>initialzation</code>; <code>condition</code>; <code>increment</code> {<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p><em>initialzation</em>、<em>condition</em> 和 <em>increment</em> 之间的分号，以及包围循环体 <em>statements</em> 的大括号都是不可省略的。</p>
+<p><code>for</code>语句的执行流程如下：</p>
+<ol style="list-style-type: decimal">
+<li><em>initialzation</em> <em>循环变量</em> 只会被执行一次，通常用于声明和初始化在接下来的循环中需要使用的变量。</li>
+<li>判断 <em>condition</em> 循环条件： 如果为<code>true</code>，<em>statements</em> <em>循环体</em> 将会被执行，然后转到第3步。如果为<code>false</code>，<em>statements</em> 和 <em>increment</em> <em>循环增量</em> 都不会被执行，<code>for</code>至此执行完毕。</li>
+<li>计算 <em>increment</em> 表达式，然后转到第2步。</li>
+</ol>
+<p>在 <em>initialzation</em> 中定义的变量仅在<code>for</code>循环的作用域内有效。<em>condition</em> 表达式的值的类型必须遵循<code>BooleanType</code>协议。</p>
+<blockquote>
+<p>For 循环语法<br /><em>for语句</em> → <strong>for</strong> <a href="../chapter3/10_Statements.html#for_init"><em>for初始条件</em></a> <em>可选</em> <strong>;</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <em>可选</em> <strong>;</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <em>可选</em> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a><br /><em>for语句</em> → <strong>for</strong> <strong>(</strong> <a href="../chapter3/10_Statements.html#for_init"><em>for初始条件</em></a> <em>可选</em> <strong>;</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <em>可选</em> <strong>;</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <em>可选</em> <strong>)</strong> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a><br /><em>for初始条件</em> → <a href="../chapter3/05_Declarations.html#variable_declaration"><em>变量声明</em></a> | <a href="../chapter3/04_Expressions.html#expression_list"><em>表达式列表</em></a></p>
+</blockquote>
+<p><a name="for-in_statements"></a></p>
+<h3 id="for-in-语句">For-In 语句</h3>
+<p><code>for-in</code>语句允许在重复执行代码块的同时，迭代集合（或遵循<code>Sequence</code>协议的任意类型）中的每一项。</p>
+<p><code>for-in</code>语句的形式如下：</p>
+<blockquote>
+<p>for <code>item</code> in <code>collection</code> {<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p><code>for-in</code>语句在循环开始前会调用 <em>collection</em> 表达式的<code>generate</code>方法来获取一个生成器类型（这是一个遵循<code>Generator</code>协议的类型）的值。接下来循环开始，调用 <em>collection</em> 表达式的<code>next</code>方法。如果其返回值不是<code>None</code>，它将会被赋给 <em>item</em>，然后执行 <em>statements</em>，执行完毕后回到循环开始处；否则，将不会赋值给 <em>item</em> 也不会执行 <em>statements</em>，<code>for-in</code>至此执行完毕。</p>
+<blockquote>
+<p>For-In 循环语法<br /><em>for-in语句</em> → <strong>for</strong> <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <strong>in</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a></p>
+</blockquote>
+<p><a name="while_statements"></a></p>
+<h3 id="while-语句">While 语句</h3>
+<p><code>while</code>语句当循环条件为真时，允许重复执行代码块。</p>
+<p><code>while</code>语句的形式如下：</p>
+<blockquote>
+<p>while <code>condition</code> {<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p><code>while</code>语句的执行流程如下：</p>
+<ol style="list-style-type: decimal">
+<li>计算 <em>condition</em> 表达式： 如果为真<code>true</code>，转到第2步。如果为<code>false</code>，<code>while</code>至此执行完毕。</li>
+<li>执行 <em>statements</em> ，然后转到第1步。</li>
+</ol>
+<p>由于 <em>condition</em> 的值在 <em>statements</em> 执行前就已计算出，因此<code>while</code>语句中的 <em>statements</em> 可能会被执行若干次，也可能不会被执行。</p>
+<p><em>condition</em> 表达式的值的类型必须遵循<code>BooleanType</code>协议。同时，<em>condition</em> 表达式也可以使用可选绑定，详情参见<a href="../chapter2/01_The_Basics.html#optional_binding">可选绑定</a>。</p>
+<blockquote>
+<p>While 循环语法<br /><em>while语句</em> → <strong>while</strong> <a href="../chapter3/10_Statements.html#while_condition"><em>while条件</em></a> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a><br /><em>条件</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> | <a href="../chapter3/05_Declarations.html#declaration"><em>声明</em></a><br /><em>条件</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a><br /><em>条件</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> | <a href="TODO"><em>条件列表</em></a><br /><em>条件</em> → <a href="../chapter3/10_Statement.html#availability"><em>可用条件</em></a> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a><br /><em>条件列表</em> → <a href="TODO"><em>条件条件</em></a> <a href="TODO"><em>条件列表</em></a><br /><em>条件</em> → <a href="../chapter3/10_Statement.html#availability"><em>可用条件</em></a> <a href="../chapter2/01_The_Basics.html#optional_binding">可选绑定条件</a><br /><em>case条件</em> → <strong>case</strong> <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <a href="TODO">构造器</a> <a href="DOTO">where</a><br /><em>可选绑定条件</em> → <a href="TODO">可选绑定头</a> <a href="TODO">持续可选绑定</a> <a href="TODO">持续可选绑定列表</a><br /><em>可选绑定头</em> → <strong>let</strong> <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <a href="TODO">构造器</a> <strong>var</strong> <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <a href="TODO">构造器</a><br /> <em>可持续绑定列表</em> → <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> | <a href="TODO">构造器</a> <a href="TODO">可选绑定头</a></p>
+</blockquote>
+<p><a name="while-while_statements"></a></p>
+<h3 id="repeat-while-语句">Repeat-While 语句</h3>
+<p><code>repeat-while</code>语句允许代码块被执行一次或多次。</p>
+<p><code>repeat-while</code>语句的形式如下：</p>
+<blockquote>
+<p>repeat {<br /> <code>statements</code><br />} while <code>condition</code></p>
+</blockquote>
+<p><code>repeat-while</code>语句的执行流程如下：</p>
+<ol style="list-style-type: decimal">
+<li>执行 <em>statements</em>，然后转到第2步。</li>
+<li>计算 <em>condition</em> 表达式： 如果为<code>true</code>，转到第1步。如果为<code>false</code>，<code>repeat-while</code>至此执行完毕。</li>
+</ol>
+<p>由于 <em>condition</em> 表达式的值是在 <em>statements</em> 执行后才计算出，因此<code>repeat-while</code>语句中的 <em>statements</em> 至少会被执行一次。</p>
+<p><em>condition</em> 表达式的值的类型必须遵循<code>BooleanType</code>协议。同时，<em>condition</em> 表达式也可以使用可选绑定，详情参见<a href="../chapter2/01_The_Basics.html#optional_binding">可选绑定</a>。</p>
+<blockquote>
+<p>Repeat-While 循环语法<br />* repeat-while语句* → <strong>repeat</strong> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a> <strong>while</strong> <a href="../chapter3/10_Statements.html#while_condition"><em>while条件</em></a></p>
+</blockquote>
+<p><a name="branch_statements"></a></p>
+<h2 id="分支语句">分支语句</h2>
+<p>取决于一个或者多个条件的值，分支语句允许程序执行指定部分的代码。显然，分支语句中条件的值将会决定如何分支以及执行哪一块代码。Swift 提供两种类型的分支语句：<code>if</code>语句和<code>switch</code>语句。</p>
+<p><code>switch</code>语句中的控制流可以用<code>break</code>语句修改，详情请见<a href="#break_statement">Break 语句</a>。</p>
+<blockquote>
+<p>分支语句语法<br /><em>分支语句</em> → <a href="../chapter3/10_Statements.html#if_statement"><em>if语句</em></a><br /><em>分支语句</em> → <a href="../chapter3/10_Statements.html#switch_statement"><em>switch语句</em></a></p>
+</blockquote>
+<p><a name="if_statements"></a></p>
+<h3 id="if-语句">If 语句</h3>
+<p>取决于一个或多个条件的值，<code>if</code>语句将决定执行哪一块代码。</p>
+<p><code>if</code>语句有两种标准形式，在这两种形式里都必须有大括号。</p>
+<p>第一种形式是当且仅当条件为真时执行代码，像下面这样：</p>
+<blockquote>
+<p>if <code>condition</code> {<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p>第二种形式是在第一种形式的基础上添加 <em>else 语句</em>，当只有一个 else 语句时，像下面这样：</p>
+<blockquote>
+<p>if <code>condition</code> {<br /> <code>statements to execute if condition is true</code><br />} else {<br /> <code>statements to execute if condition is false</code><br />}</p>
+</blockquote>
+<p>同时，else 语句也可包含<code>if</code>语句，从而形成一条链来测试更多的条件，像下面这样：</p>
+<blockquote>
+<p>if <code>condition 1</code> {<br /> <code>statements to execute if condition 1 is true</code><br />} else if <code>condition 2</code> {<br /> <code>statements to execute if condition 2 is true</code><br />}<br />else {<br /> <code>statements to execute if both conditions are false</code><br />}</p>
+</blockquote>
+<p><code>if</code>语句中条件的值的类型必须遵循<code>LogicValue</code>协议。同时，条件也可以使用可选绑定，详情参见<a href="../chapter2/01_The_Basics.html#optional_binding">可选绑定</a>。</p>
+<blockquote>
+<p>If语句语法<br /><em>if语句</em> → <strong>if</strong> <a href="../chapter3/10_Statements.html#if_condition"><em>if条件</em></a> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a> <a href="../chapter3/10_Statements.html#else_clause"><em>else(Clause)</em></a> <em>可选</em><br /><em>if条件</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> | <a href="../chapter3/05_Declarations.html#declaration"><em>声明</em></a><br /><em>else(Clause)</em> → <strong>else</strong> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a> | <strong>else</strong> <a href="../chapter3/10_Statements.html#if_statement"><em>if语句</em></a></p>
+</blockquote>
+<p><a name="guard_statements"></a></p>
+<h3 id="guard-语句">Guard 语句</h3>
+<p><code>guard</code> 语句用来转移程序控制出其作用域，如果一个或者多个条件不成立。 <code>guard</code> 语句的格式如下：<br /> &gt; guard <code>condition</code> else {<br /> <code>statements</code><br /> &gt;}</p>
+<p><code>guard</code>语句中条件值的类型必须遵循<code>LogicValue</code>协议。且条件可以使用可选绑定，详情参见<a href="../chapter2/01_The_Basics.html#optional_binding">可选绑定</a>。</p>
+<p>在<code>guard</code>语句中声明的常量或者变量，可用范围从声明开始到作用域结束,常量和变量的值从可选绑定声明中分配。</p>
+<p><code>guard</code>语句需要有<code>else</code>子句，并且必须调用被<code>noreturn</code>属性标记的函数,或者使用下面的语句把程序执行转移到guard语句的作用域外。</p>
+<ul>
+<li><code>return</code></li>
+<li><code>break</code></li>
+<li><code>continue</code></li>
+<li><code>throw</code></li>
+</ul>
+<p>执行转移语句详情参见<a href="TODO">控制传递语句</a></p>
+<p><a name="switch_statements"></a></p>
+<h3 id="switch-语句">Switch 语句</h3>
+<p>取决于<code>switch</code>语句的<em>控制表达式（control expression）</em>，<code>switch</code>语句将决定执行哪一块代码。</p>
+<p><code>switch</code>语句的形式如下：</p>
+<blockquote>
+<p>switch <code>control expression</code> {<br /> case <code>pattern 1</code>:<br /> <code>statements</code><br /> case <code>pattern 2</code> where <code>condition</code>:<br /> <code>statements</code><br /> case <code>pattern 3</code> where <code>condition</code>,<br /> <code>pattern 4</code> where <code>condition</code>:<br /> <code>statements</code><br /> default:<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p><code>switch</code>语句的<em>控制表达式（control expression）</em>会首先被计算，然后与每一个 case 的模式（pattern）进行匹配。如果匹配成功，程序将会执行对应的 case 分支里的 <em>statements</em>。另外，每一个 case 分支都不能为空，也就是说在每一个 case 分支中至少有一条语句。如果你不想在匹配到的 case 分支中执行代码，只需在该分支里写一条<code>break</code>语句即可。</p>
+<p>可以用作控制表达式的值是十分灵活的，除了标量类型(scalar types，如<code>Int</code>、<code>Character</code>)外，你可以使用任何类型的值，包括浮点数、字符串、元组、自定义类的实例和可选（optional）类型，甚至是枚举类型中的成员值和指定的范围(range)等。关于在<code>switch</code>语句中使用这些类型，详情参见<a href="../chapter2/05_Control_Flow.html">控制流</a>一章的 <a href="../chapter2/05_Control_Flow.html#switch">Switch</a>。</p>
+<p>你可以在模式后面添加一个起保护作用的表达式(guard expression)。<em>起保护作用的表达式</em>是这样构成的：关键字<code>where</code>后面跟着一个作为额外测试条件的表达式。因此，当且仅当<em>控制表达式</em>匹配一个<em>case</em>的某个模式且起保护作用的表达式为真时，对应 case 分支中的 <em>statements</em> 才会被执行。在下面的例子中，<em>控制表达式</em>只会匹配含两个相等元素的元组，如<code>(1, 1)</code>：</p>
+<pre class="swift"><code>case let (x, y) where x == y:</code></pre>
+<p>正如上面这个例子，也可以在模式中使用<code>let</code>（或<code>var</code>）语句来绑定常量（或变量）。这些常量（或变量）可以在其对应的起保护作用的表达式和其对应的<em>case</em>块里的代码中引用。但是，如果 case 中有多个模式匹配控制表达式，那么这些模式都不能绑定常量（或变量）。</p>
+<p><code>switch</code>语句也可以包含默认（<code>default</code>）分支，只有其它 case 分支都无法匹配控制表达式时，默认分支中的代码才会被执行。一个<code>switch</code>语句只能有一个默认分支，而且必须在<code>switch</code>语句的最后面。</p>
+<p>尽管模式匹配操作实际的执行顺序，特别是模式的计算顺序是不可知的，但是 Swift 规定<code>switch</code>语句中的模式匹配的顺序和书写源代码的顺序保持一致。因此，当多个模式含有相同的值且能够匹配控制表达式时，程序只会执行源代码中第一个匹配的 case 分支中的代码。</p>
+<h4 id="switch-语句必须是完备的">Switch 语句必须是完备的</h4>
+<p>在 Swift 中，<code>switch</code>语句中控制表达式的每一个可能的值都必须至少有一个 case 分支与之对应。在某些情况下（例如，表达式的类型是<code>Int</code>），你可以使用默认块满足该要求。</p>
+<h4 id="不存在隐式的贯穿fall-through">不存在隐式的贯穿(fall through)</h4>
+<p>当匹配的 case 分支中的代码执行完毕后，程序会终止<code>switch</code>语句，而不会继续执行下一个 case 分支。这就意味着，如果你想执行下一个 case 分支，需要显式地在你需要的 case 分支里使用<code>fallthrough</code>语句。关于<code>fallthrough</code>语句的更多信息，详情参见 <a href="#fallthrough_statement">Fallthrough 语句</a>。</p>
+<blockquote>
+<p>Switch语句语法<br /><em>switch语句</em> → <strong>switch</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <strong>{</strong> <a href="../chapter3/10_Statements.html#switch_cases"><em>SwitchCase列表</em></a> <em>可选</em> <strong>}</strong><br /><em>SwitchCase列表</em> → <a href="../chapter3/10_Statements.html#switch_case"><em>SwitchCase</em></a> <a href="../chapter3/10_Statements.html#switch_cases"><em>SwitchCase列表</em></a> <em>可选</em><br /><em>SwitchCase</em> → <a href="../chapter3/10_Statements.html#case_label"><em>case标签</em></a> <a href="../chapter3/10_Statements.html#statements"><em>多条语句(Statements)</em></a> | <a href="../chapter3/10_Statements.html#default_label"><em>default标签</em></a> <a href="../chapter3/10_Statements.html#statements"><em>多条语句(Statements)</em></a><br /><em>SwitchCase</em> → <a href="../chapter3/10_Statements.html#case_label"><em>case标签</em></a> <strong>;</strong> | <a href="../chapter3/10_Statements.html#default_label"><em>default标签</em></a> <strong>;</strong><br /><em>case标签</em> → <strong>case</strong> <a href="../chapter3/10_Statements.html#case_item_list"><em>case项列表</em></a> <strong>:</strong><br /><em>case项列表</em> → <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <a href="../chapter3/10_Statements.html#guard_clause"><em>guard-clause</em></a> <em>可选</em> | <a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a> <a href="../chapter3/10_Statements.html#guard_clause"><em>guard-clause</em></a> <em>可选</em> <strong>,</strong> <a href="../chapter3/10_Statements.html#case_item_list"><em>case项列表</em></a><br /><em>default标签</em> → <strong>default</strong> <strong>:</strong><br /><em>where-clause</em> → <strong>where</strong> <a href="../chapter3/10_Statements.html#guard"><em>guard-expression</em></a><br /><em>where-expression</em> → <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a></p>
+</blockquote>
+<p><a name="labeled_statements"></a> <a name="control_transfer_statements"></a></p>
+<h2 id="带标签的语句">带标签的语句</h2>
+<p>你可以在循环语句或<code>switch</code>语句前面加上<em>标签</em>，它由标签名和紧随其后的冒号(:)组成。在<code>break</code>和<code>continue</code>后面跟上标签名可以显式地在循环语句或<code>switch</code>语句中更改控制流，把控制权传递给指定标签标记的语句。关于这两条语句用法，详情参见 <a href="#break_statement">Break 语句</a>和 <a href="#continue_statement">Continue 语句</a>。</p>
+<p>标签的作用域是该标签所标记的语句之后的所有语句。你可以不使用带标签的语句，但只要使用它，标签名就必唯一。</p>
+<p>关于使用带标签的语句的例子，详情参见<a href="../chapter2/05_Control_Flow.html">控制流</a>一章的<a href="../chapter2/05_Control_Flow.html#labeled_statements">带标签的语句</a>。</p>
+<blockquote>
+<p>标记语句语法<br /><em>标记语句(Labeled Statement)</em> → <a href="../chapter3/10_Statements.html#statement_label"><em>语句标签</em></a> <a href="../chapter3/10_Statements.html#loop_statement"><em>循环语句</em></a> | <a href="../chapter3/10_Statements.html#statement_label"><em>语句标签</em></a> <a href="../chapter3/10_Statements.html#switch_statement"><em>switch语句</em></a><br /><em>语句标签</em> → <a href="../chapter3/10_Statements.html#label_name"><em>标签名称</em></a> <strong>:</strong><br /><em>标签名称</em> → <a href="../chapter3/02_Lexical_Structure.html#identifier"><em>标识符</em></a></p>
+</blockquote>
+<p><a name="control_transfer_statements"></a></p>
+<h2 id="控制传递语句">控制传递语句</h2>
+<p>通过无条件地把控制权从一片代码传递到另一片代码，控制传递语句能够改变代码执行的顺序。Swift 提供四种类型的控制传递语句：<code>break</code>语句、<code>continue</code>语句、<code>fallthrough</code>语句和<code>return</code>语句。</p>
+<blockquote>
+<p>控制传递语句(Control Transfer Statement) 语法<br /><em>控制传递语句</em> → <a href="../chapter3/10_Statements.html#break_statement"><em>break语句</em></a><br /><em>控制传递语句</em> → <a href="../chapter3/10_Statements.html#continue_statement"><em>continue语句</em></a><br /><em>控制传递语句</em> → <a href="../chapter3/10_Statements.html#fallthrough_statement"><em>fallthrough语句</em></a><br /><em>控制传递语句</em> → <a href="../chapter3/10_Statements.html#return_statement"><em>return语句</em></a><br /><em>控制传递语句</em> → <a href="../chapter3/10_Statements.html#throw_statement"><em>throw语句</em></a></p>
+</blockquote>
+<p><a name="break_statements"></a></p>
+<h3 id="break-语句">Break 语句</h3>
+<p><code>break</code>语句用于终止循环或<code>switch</code>语句的执行。使用<code>break</code>语句时，可以只写<code>break</code>这个关键词，也可以在<code>break</code>后面跟上标签名（label name），像下面这样：</p>
+<blockquote>
+<p>break<br />break <code>label name</code></p>
+</blockquote>
+<p>当<code>break</code>语句后面带标签名时，可用于终止由这个标签标记的循环或<code>switch</code>语句的执行。</p>
+<p>而当只写<code>break</code>时，则会终止<code>switch</code>语句或上下文中包含<code>break</code>语句的最内层循环的执行。</p>
+<p>在这两种情况下，控制权都会被传递给循环或<code>switch</code>语句外面的第一行语句。</p>
+<p>关于使用<code>break</code>语句的例子，详情参见<a href="../chapter2/05_Control_Flow.html">控制流</a>一章的 <a href="../chapter2/05_Control_Flow.html#break">Break</a> 和<a href="../chapter2/05_Control_Flow.html#labeled_statements">带标签的语句</a>。</p>
+<blockquote>
+<p>Break 语句语法<br /><em>break语句</em> → <strong>break</strong> <a href="../chapter3/10_Statements.html#label_name"><em>标签名称</em></a> <em>可选</em></p>
+</blockquote>
+<p><a name="continue_statements"></a></p>
+<h3 id="continue-语句">Continue 语句</h3>
+<p><code>continue</code>语句用于终止循环中当前迭代的执行，但不会终止该循环的执行。使用<code>continue</code>语句时，可以只写<code>continue</code>这个关键词，也可以在<code>continue</code>后面跟上标签名（label name），像下面这样：</p>
+<blockquote>
+<p>continue<br />continue <code>label name</code></p>
+</blockquote>
+<p>当<code>continue</code>语句后面带标签名时，可用于终止由这个标签标记的循环中当前迭代的执行。</p>
+<p>而当只写<code>break</code>时，可用于终止上下文中包含<code>continue</code>语句的最内层循环中当前迭代的执行。</p>
+<p>在这两种情况下，控制权都会被传递给循环外面的第一行语句。</p>
+<p>在<code>for</code>语句中，<code>continue</code>语句执行后，<em>increment</em> 表达式还是会被计算，这是因为每次循环体执行完毕后 <em>increment</em> 表达式都会被计算。</p>
+<p>关于使用<code>continue</code>语句的例子，详情参见<a href="../chapter2/05_Control_Flow.html">控制流</a>一章的 <a href="../chapter2/05_Control_Flow.html#continue">Continue</a> 和<a href="../chapter2/05_Control_Flow.html#labeled_statements">带标签的语句</a>。</p>
+<blockquote>
+<p>Continue 语句语法<br /><em>continue语句</em> → <strong>continue</strong> <a href="../chapter3/10_Statements.html#label_name"><em>标签名称</em></a> <em>可选</em></p>
+</blockquote>
+<p><a name="fallthrough_statements"></a></p>
+<h3 id="fallthrough-语句">Fallthrough 语句</h3>
+<p><code>fallthrough</code>语句用于在<code>switch</code>语句中传递控制权。<code>fallthrough</code>语句会把控制权从<code>switch</code>语句中的一个 case 传递给下一个 case 。这种传递是无条件的，即使下一个 case 的模式与<code>switch</code>语句的控制表达式的值不匹配。</p>
+<p><code>fallthrough</code>语句可出现在<code>switch</code>语句中的任意 case 里，但不能出现在最后一个 case 分支中。同时，<code>fallthrough</code>语句也不能把控制权传递给使用了可选绑定的 case 分支。</p>
+<p>关于在<code>switch</code>语句中使用<code>fallthrough</code>语句的例子，详情参见<a href="../chapter2/05_Control_Flow.html">控制流</a>一章的<a href="../chapter2/05_Control_Flow.html#control_transfer_statements">控制传递语句</a>。</p>
+<blockquote>
+<p>Fallthrough 语句语法<br /><em>fallthrough语句</em> → <strong>fallthrough</strong></p>
+</blockquote>
+<p><a name="return_statements"></a></p>
+<h3 id="return-语句">Return 语句</h3>
+<p><code>return</code>语句用于在函数或方法的实现中将控制权传递给调用者，接着程序将会从调用者的位置继续向下执行。</p>
+<p>使用<code>return</code>语句时，可以只写<code>return</code>这个关键词，也可以在<code>return</code>后面跟上表达式，像下面这样：</p>
+<blockquote>
+<p>return<br />return <code>expression</code></p>
+</blockquote>
+<p>当<code>return</code>语句后面带表达式时，表达式的值将会返回给调用者。如果表达式值的类型与调用者期望的类型不匹配，Swift 则会在返回表达式的值之前将表达式值的类型转换为调用者期望的类型。</p>
+<p>而当只写<code>return</code>时，仅仅是将控制权从该函数或方法传递给调用者，而不返回一个值。（这就是说，该函数或方法的返回类型为<code>Void</code>或<code>()</code>）</p>
+<blockquote>
+<p>Return 语句语法<br /><em>return语句</em> → <strong>return</strong> <a href="../chapter3/04_Expressions.html#expression"><em>表达式</em></a> <em>可选</em></p>
+</blockquote>
+<p><a name="availability_statements"></a></p>
+<h3 id="availability-语句">Availability 语句</h3>
+<p>可用性条件，被当做<code>if</code> ，<code>while</code> 语句的条件，并且 <code>guard</code> 语句在运行时会基于特定的语法格式查询接口的可用性。</p>
+<p>avaliability 语句的形式如下： &gt; if #available(<code>platform name version</code>,<code>...</code>, *) {<br />&gt; <code>statements to execute if the APIs are available</code><br />&gt; } else {<br />&gt; <code>fallback statements to execute if the APIs are unavailable</code><br />&gt; }</p>
+<p>可用性条件执行一个代码块时，取决于在运行时想要使用的接口是否可用。 当编译器检查到代码块中的接口是可用的，则从可用性条件中获取相应信息。</p>
+<p>可用性条件使用逗号分隔平台名称和版本列表。使用<code>iOS</code>，<code>OSX</code>，以及<code>watchOS</code>为平台名称，包括相应的版本号。*参数是必需的。在任何平台上代码块主体都被可用性条件保护起来，由满足最低部署条件的目标设备运行。</p>
+<p>与布尔类型条件不同，不能用逻辑运算符 <strong>&amp;&amp;</strong> 和 <strong>||</strong> 合并可用性条件。</p>
+<blockquote>
+<p>可用性条件语法<br /><em>可用性条件</em> → <strong>#available</strong> ( <a href="TODO">availability-arguments­</a> )<br /><em>可用性条件</em> → <a href="TODO">availability-argument­</a> | <a href="TODO">availability-argument</a>­ ,­ <a href="TODO">availability-arguments­</a><br /><em>可用性条件</em> → <a href="TODO">平台名称</a> <a href="TODO">版本号</a><br /><em>可用性条件</em> → <strong>*</strong><br /><em>平台名称</em> → <strong>iOS</strong> | <strong>iOSApplicationExtension</strong><br /><em>平台名称</em> → <strong>OSX</strong> | <strong>OSXApplicationExtension­</strong><br /><em>平台名称</em> → <strong>watchOS</strong><br /><em>版本号</em> → <a href="TODO">十进制数字</a><br /><em>版本号</em> → <a href="TODO">十进制数字</a> <strong>.</strong> <a href="TODO">十进制数字</a><br /><em>版本号</em> → <a href="TODO">十进制数字</a> <strong>.</strong> <a href="TODO">十进制数字</a> <strong>.</strong> <a href="TODO">十进制数字</a></p>
+</blockquote>
+<p><a name="throw_statements"></a></p>
+<h3 id="throw-语句">Throw 语句</h3>
+<p><code>throw</code>语句出现在抛出函数或者抛出方法体内，或者类型被<code>throws</code>关键字标记的表达式体内。</p>
+<p><code>throw</code>语句使程序结束执行当前的作用域，并在封闭作用域中传播错误。抛出的错误会一直传播，直到被<code>do</code>语句的<code>catch</code>子句处理掉。</p>
+<p><code>throw</code>语句由<code>throw</code>关键字 跟一个表达式组成 ，如下所示。</p>
+<blockquote>
+<p>throw <code>expression</code></p>
+</blockquote>
+<p>表达式值的类型必须遵循 <code>LogicValue</code>协议</p>
+<p>关于如何使用<code>throw</code>语句的例子，详情参见<a href="TODO">错误处理</a>一章的<a href="TODO">抛出错误</a>。</p>
+<blockquote>
+<p>throw 语句语法<br /><em>抛出语句</em> → <strong>throw</strong> <em><a href="TODO">表达式­</a></em></p>
+</blockquote>
+<p><a name="defer_statements"></a></p>
+<h3 id="defer-语句">Defer 语句</h3>
+<p><code>defer</code> 语句用于转移程序控制出延迟语句作用域之前执行代码。</p>
+<p>在 <code>defer</code> 语句中的语句无论程序控制如何转移都会执行。这意味着 <code>defer</code> 语句可以被使用在以下这些情况，像手动得执行资源管理，关闭文件描述，或者即使抛出了错误也需要去实现执行一些动作。</p>
+<p>如果多个 <code>defer</code> 语句出现在同一范围内，那么它们执行的顺序与出现的顺序相反。给定作用域中的第一个<code>defer</code> 语句，会在最后执行，这意味着最后执行的延迟语句中的语句涉及的资源可以被其他 <code>defer</code>语句清理掉。</p>
+<blockquote>
+<p>1 func f( ) {<br />2 defer { print(&quot;First&quot;) }<br />3 defer { print(&quot;Second&quot;) }<br />4 defer { print(&quot;Third&quot;) }<br />5 }<br />6 f()<br />7 // prints &quot;Third&quot;<br />8 // prints &quot;Second&quot;<br />9 // prints &quot;First&quot;</p>
+</blockquote>
+<p><code>defer</code> 语句中的语句无法转移程序控制出延迟语句。</p>
+<blockquote>
+<p>defer 语句语法<br /><em>延迟语句</em> → <strong>defer</strong> <em><a href="TODO">代码块</a></em></p>
+</blockquote>
+<p><a name="do_statements"></a></p>
+<h3 id="do-语句">Do 语句</h3>
+<p><code>do</code> 语句用于引入一个新的作用域,该作用域中可以含有一个或多个<code>catch</code>子句,catch子句中定义了一些匹配错误情况的模式。<code>do</code> 语句作用域内定义的常量和变量，只能在do语句作用域内访问。</p>
+<p>swift 中的 do 语句与C 中限定代码块界限的大括号 （{}）很相似，并且在程序运行的时候并不会造成系统开销。</p>
+<blockquote>
+<p>do {<br /> try <code>expression</code><br /> <code>statements</code><br />} catch <code>pattern 1</code> {<br /> <code>statements</code><br />} catch <code>pattern 2</code> where condition {<br /> <code>statements</code><br />}</p>
+</blockquote>
+<p>如同<code>switch</code>语句,编译器会判断<code>catch</code>子句是否被遗漏。如果catch没有被遗漏，则认为错误被处理。否则，错误会自动传播出包含作用域,被一个封闭的<code>catch</code>语句或抛出函数处理掉，包含函数必须以<code>throws</code>关键字声明。</p>
+<p>为了确保错误已经被处理，使用一个匹配所有错误的<code>catch</code>子句，如通配符模式（_）。如果一个<code>catch</code>子句不指定一种模式，<code>catch</code>子句会匹配和约束任何局部变量命名的<code>error</code>。有关在<code>catch</code>子句中使用模式的更多信息，详见<a href="TODO">模式</a>。</p>
+<p>关于在一些<code>catch</code>子句中如何使用<code>do</code>语句的例子，详情参见<a href="TODO">错误处理</a>一章的<a href="TODO">抛出错误</a>。</p>
+<blockquote>
+<p>do 语句语法 → <strong>do</strong> <em><a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a> <a href="TODO">catch</a></em><br />catch → <em><a href="TODO">catch子句</a> <a href="TODO">catch子句</a></em><br />catch → <strong>catch</strong> *<a href="../chapter3/07_Patterns.html#pattern"><em>模式</em></a>** <em>可选的</em> <a href=""><em>where</em></a> <em>可选的</em> <a href="../chapter3/05_Declarations.html#code_block"><em>代码块</em></a></p>
+</blockquote>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+

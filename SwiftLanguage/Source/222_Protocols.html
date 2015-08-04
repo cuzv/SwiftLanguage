@@ -1,0 +1,617 @@
+<meta http-equiv=Content-Type content="text/html;charset=utf-8">
+
+<blockquote>
+<p>1.0 翻译：<a href="https://github.com/geek5nan">geek5nan</a> 校对：<a href="https://github.com/dabing1022">dabing1022</a></p>
+</blockquote>
+<blockquote>
+<p>2.0 翻译+校对：<a href="https://github.com/futantan">futantan</a></p>
+</blockquote>
+<h2 id="协议"># 协议</h2>
+<p>本页包含内容：</p>
+<ul>
+<li><a href="#protocol_syntax">协议的语法（Protocol Syntax）</a></li>
+<li><a href="#property_requirements">对属性的规定（Property Requirements）</a></li>
+<li><a href="#method_requirements">对方法的规定（Method Requirements）</a></li>
+<li><a href="#mutating_method_requirements">对Mutating方法的规定（Mutating Method Requirements）</a></li>
+<li><a href="#initializer_requirements">对构造器的规定（Initializer Requirements）</a></li>
+<li><a href="#protocols_as_types">协议类型（Protocols as Types）</a></li>
+<li><a href="#delegation">委托(代理)模式（Delegation）</a></li>
+<li><a href="#adding_protocol_conformance_with_an_extension">在扩展中添加协议成员（Adding Protocol Conformance with an Extension）</a></li>
+<li><a href="#declaring_protocol_adoption_with_an_extension">通过扩展补充协议声明（Declaring Protocol Adoption with an Extension）</a></li>
+<li><a href="#collections_of_protocol_types">集合中的协议类型（Collections of Protocol Types）</a></li>
+<li><a href="#protocol_inheritance">协议的继承（Protocol Inheritance）</a></li>
+<li><a href="#class_only_protocol">类专属协议（Class-Only Protocol）</a></li>
+<li><a href="#protocol_composition">协议合成（Protocol Composition）</a></li>
+<li><a href="#checking_for_protocol_conformance">检验协议的一致性（Checking for Protocol Conformance）</a></li>
+<li><a href="#optional_protocol_requirements">对可选协议的规定（Optional Protocol Requirements）</a></li>
+<li><a href="#protocol_extensions">协议扩展（Protocol Extensions）</a></li>
+</ul>
+<p><code>协议</code>定义了一个蓝图，规定了用来实现某一特定工作或者功能所必需的方法和属性。类，结构体或枚举类型都可以遵循协议，并提供具体实现来完成协议定义的方法和功能。任意能够满足协议要求的类型被称为<code>遵循(conform)</code>这个协议。</p>
+<p><a name="protocol_syntax"></a></p>
+<h2 id="协议的语法">协议的语法</h2>
+<p>协议的定义方式与类，结构体，枚举的定义非常相似。</p>
+<pre class="swift"><code>protocol SomeProtocol {
+    // 协议内容
+}</code></pre>
+<p>要使类遵循某个协议，需要在类型名称后加上协议名称，中间以冒号<code>:</code>分隔，作为类型定义的一部分。遵循多个协议时，各协议之间用逗号<code>,</code>分隔。</p>
+<pre class="swift"><code>struct SomeStructure: FirstProtocol, AnotherProtocol {
+    // 结构体内容
+}</code></pre>
+<p>如果类在遵循协议的同时拥有父类，应该将父类名放在协议名之前，以逗号分隔。</p>
+<pre class="swift"><code>class SomeClass: SomeSuperClass, FirstProtocol, AnotherProtocol {
+    // 类的内容
+}</code></pre>
+<p><a name="property_requirements"></a></p>
+<h2 id="对属性的规定">对属性的规定</h2>
+<p>协议可以规定其<code>遵循者</code>提供特定名称和类型的<code>实例属性(instance property)</code>或<code>类属性(type property)</code>，而不指定是<code>存储型属性(stored property)</code>还是<code>计算型属性(calculate property)</code>。此外还必须指明是只读的还是可读可写的。</p>
+<p>如果协议规定属性是可读可写的，那么这个属性不能是常量或只读的计算属性。如果协议只要求属性是只读的(gettable)，那个属性不仅可以是只读的，如果你代码需要的话，也可以是可写的。</p>
+<p>协议中的通常用var来声明属性，在类型声明后加上<code>{ set get }</code>来表示属性是可读可写的，只读属性则用<code>{ get }</code>来表示。</p>
+<pre class="swift"><code>protocol SomeProtocol {
+    var mustBeSettable : Int { get set }
+    var doesNotNeedToBeSettable: Int { get }
+}</code></pre>
+<p>在协议中定义类属性(type property)时，总是使用<code>static</code>关键字作为前缀。当协议的遵循者是类时，可以使用<code>class</code>或<code>static</code>关键字来声明类属性，但是在协议的定义中，仍然要使用<code>static</code>关键字。</p>
+<pre class="swift"><code>protocol AnotherProtocol {
+    static var someTypeProperty: Int { get set }
+}</code></pre>
+<p>如下所示，这是一个含有一个实例属性要求的协议。</p>
+<pre class="swift"><code>protocol FullyNamed {
+    var fullName: String { get }
+}</code></pre>
+<p><code>FullyNamed</code>协议除了要求协议的遵循者提供fullName属性外，对协议对遵循者的类型并没有特别的要求。这个协议表示，任何遵循<code>FullyNamed</code>协议的类型，都具有一个可读的<code>String</code>类型实例属性<code>fullName</code>。</p>
+<p>下面是一个遵循<code>FullyNamed</code>协议的简单结构体。</p>
+<pre class="swift"><code>struct Person: FullyNamed{
+    var fullName: String
+}
+let john = Person(fullName: &quot;John Appleseed&quot;)
+//john.fullName 为 &quot;John Appleseed&quot;</code></pre>
+<p>这个例子中定义了一个叫做<code>Person</code>的结构体，用来表示具有名字的人。从第一行代码中可以看出，它遵循了<code>FullyNamed</code>协议。</p>
+<p><code>Person</code>结构体的每一个实例都有一个叫做<code>fullName</code>，<code>String</code>类型的存储型属性。这正好满足了<code>FullyNamed</code>协议的要求，也就意味着，<code>Person</code>结构体完整的<code>遵循</code>了协议。(如果协议要求未被完全满足,在编译时会报错)</p>
+<p>下面是一个更为复杂的类，它采用并遵循了<code>FullyNamed</code>协议:</p>
+<pre class="swift"><code>class Starship: FullyNamed {
+    var prefix: String?
+    var name: String
+    init(name: String, prefix: String? = nil) {
+        self.name = name
+        self.prefix = prefix
+    }
+    var fullName: String {
+        return (prefix != nil ? prefix! + &quot; &quot; : &quot;&quot;) + name
+    }
+}
+var ncc1701 = Starship(name: &quot;Enterprise&quot;, prefix: &quot;USS&quot;)
+// ncc1701.fullName is &quot;USS Enterprise&quot;</code></pre>
+<p>Starship类把<code>fullName</code>属性实现为只读的计算型属性。每一个<code>Starship</code>类的实例都有一个名为<code>name</code>的属性和一个名为<code>prefix</code>的可选属性。 当<code>prefix</code>存在时，将<code>prefix</code>插入到<code>name</code>之前来为Starship构建<code>fullName</code>，<code>prefix</code>不存在时，则将直接用<code>name</code>构建<code>fullName</code>。</p>
+<p><a name="method_requirements"></a></p>
+<h2 id="对方法的规定">对方法的规定</h2>
+<p>协议可以要求其遵循者实现某些指定的实例方法或类方法。这些方法作为协议的一部分，像普通的方法一样放在协议的定义中，但是不需要大括号和方法体。可以在协议中定义具有可变参数的方法，和普通方法的定义方式相同。但是在协议的方法定义中，不支持参数默认值。</p>
+<p>正如对属性的规定中所说的，在协议中定义类方法的时候，总是使用<code>static</code>关键字作为前缀。当协议的遵循者是类的时候，虽然你可以在类的实现中使用<code>class</code>或者<code>static</code>来实现类方法，但是在协议中声明类方法，仍然要使用<code>static</code>关键字。</p>
+<pre class="swift"><code>protocol SomeProtocol {
+    static func someTypeMethod()
+}</code></pre>
+<p>下面的例子定义了含有一个实例方法的协议。</p>
+<pre class="swift"><code>protocol RandomNumberGenerator {
+    func random() -&gt; Double
+}</code></pre>
+<p><code>RandomNumberGenerator</code>协议要求其遵循者必须拥有一个名为<code>random</code>， 返回值类型为<code>Double</code>的实例方法。尽管这里并未指明，但是我们假设返回值在[0，1)区间内。</p>
+<p><code>RandomNumberGenerator</code>协议并不在意每一个随机数是怎样生成的，它只强调这里有一个随机数生成器。</p>
+<p>如下所示，下边的是一个遵循了<code>RandomNumberGenerator</code>协议的类。该类实现了一个叫做<em>线性同余生成器(linear congruential generator)</em>的伪随机数算法。</p>
+<pre class="swift"><code>class LinearCongruentialGenerator: RandomNumberGenerator {
+    var lastRandom = 42.0
+    let m = 139968.0
+    let a = 3877.0
+    let c = 29573.0
+    func random() -&gt; Double {
+        lastRandom = ((lastRandom * a + c) % m)
+        return lastRandom / m
+    }
+}
+let generator = LinearCongruentialGenerator()
+print(&quot;Here&#39;s a random number: \(generator.random())&quot;)
+// 输出 : &quot;Here&#39;s a random number: 0.37464991998171&quot;
+print(&quot;And another one: \(generator.random())&quot;)
+// 输出 : &quot;And another one: 0.729023776863283&quot;</code></pre>
+<p><a name="mutating_method_requirements"></a></p>
+<h2 id="对mutating方法的规定">对Mutating方法的规定</h2>
+<p>有时需要在方法中改变它的实例。例如，值类型(结构体，枚举)的实例方法中，将<code>mutating</code>关键字作为函数的前缀，写在<code>func</code>之前，表示可以在该方法中修改它所属的实例及其实例属性的值。这一过程在<a href="./11_Methods.html#modifying_value_types_from_within_instance_methods">在实例方法中修改值类型</a>章节中有详细描述。</p>
+<p>如果你在协议中定义了一个方法旨在改变遵循该协议的实例，那么在协议定义时需要在方法前加<code>mutating</code>关键字。这使得结构和枚举遵循协议并满足此方法要求。</p>
+<blockquote>
+<p>注意:<br />用类实现协议中的<code>mutating</code>方法时，不用写<code>mutating</code>关键字;用结构体，枚举实现协议中的<code>mutating</code>方法时，必须写<code>mutating</code>关键字。</p>
+</blockquote>
+<p>如下所示，<code>Togglable</code>协议含有名为<code>toggle</code>的实例方法。根据名称推测，<code>toggle()</code>方法将通过改变实例属性，来切换遵循该协议的实例的状态。</p>
+<p><code>toggle()</code>方法在定义的时候，使用<code>mutating</code>关键字标记，这表明当它被调用时该方法将会改变协议遵循者实例的状态。</p>
+<pre class="swift"><code>protocol Togglable {
+    mutating func toggle()
+}</code></pre>
+<p>当使用<code>枚举</code>或<code>结构体</code>来实现<code>Togglable</code>协议时，需要提供一个带有<code>mutating</code>前缀的<code>toggle</code>方法。</p>
+<p>下面定义了一个名为<code>OnOffSwitch</code>的枚举类型。这个枚举类型在两种状态之间进行切换，用枚举成员<code>On</code>和<code>Off</code>表示。枚举类型的<code>toggle</code>方法被标记为<code>mutating</code>以满足<code>Togglable</code>协议的要求。</p>
+<pre class="swift"><code>enum OnOffSwitch: Togglable {
+    case Off, On
+    mutating func toggle() {
+        switch self {
+        case Off:
+            self = On
+        case On:
+            self = Off
+        }
+    }
+}
+var lightSwitch = OnOffSwitch.Off
+lightSwitch.toggle()
+//lightSwitch 现在的值为 .On</code></pre>
+<p><a name="initializer_requirements"></a></p>
+<h2 id="对构造器的规定">对构造器的规定</h2>
+<p>协议可以要求它的遵循者实现指定的构造器。你可以像书写普通的构造器那样，在协议的定义里写下构造器的声明，但不需要写花括号和构造器的实体：</p>
+<pre class="swift"><code>protocol SomeProtocol {
+    init(someParameter: Int)
+}</code></pre>
+<h3 id="协议构造器规定在类中的实现">协议构造器规定在类中的实现</h3>
+<p>你可以在遵循该协议的类中实现构造器，并指定其为类的指定构造器(designated initializer)或者便利构造器(convenience initializer)。在这两种情况下，你都必须给构造器实现标上&quot;required&quot;修饰符：</p>
+<pre class="swift"><code>class SomeClass: SomeProtocol {
+    required init(someParameter: Int) {
+        //构造器实现
+    }
+}</code></pre>
+<p>使用<code>required</code>修饰符可以保证：所有的遵循该协议的子类，同样能为构造器规定提供一个显式的实现或继承实现。</p>
+<p>关于<code>required</code>构造器的更多内容，请参考<a href="./14_Initialization.html#required_initializers">必要构造器</a>。</p>
+<blockquote>
+<p>注意<br />如果类已经被标记为<code>final</code>，那么不需要在协议构造器的实现中使用<code>required</code>修饰符。因为final类不能有子类。关于<code>final</code>修饰符的更多内容，请参见<a href="./13_Inheritance.html#preventing_overrides">防止重写</a>。</p>
+</blockquote>
+<p>如果一个子类重写了父类的指定构造器，并且该构造器遵循了某个协议的规定，那么该构造器的实现需要被同时标示<code>required</code>和<code>override</code>修饰符</p>
+<pre class="swift"><code>protocol SomeProtocol {
+    init()
+}
+
+
+class SomeSuperClass {
+    init() {
+        // 构造器的实现
+    }
+}
+
+
+class SomeSubClass: SomeSuperClass, SomeProtocol {
+    // 因为遵循协议，需要加上&quot;required&quot;; 因为继承自父类，需要加上&quot;override&quot;
+    required override init() {
+        // 构造器实现
+    }
+}</code></pre>
+<h3 id="可失败构造器的规定">可失败构造器的规定</h3>
+<p>可以通过给协议<code>Protocols</code>中添加<a href="./14_Initialization.html#failable_initializers">可失败构造器</a>来使遵循该协议的类型必须实现该可失败构造器。</p>
+<p>如果在协议中定义一个可失败构造器，则在遵顼该协议的类型中必须添加同名同参数的可失败构造器或非可失败构造器。如果在协议中定义一个非可失败构造器，则在遵循该协议的类型中必须添加同名同参数的非可失败构造器或隐式解析类型的可失败构造器（<code>init!</code>）。</p>
+<p><a name="protocols_as_types"></a></p>
+<h2 id="协议类型">协议类型</h2>
+<p>尽管协议本身并不实现任何功能，但是协议可以被当做类型来使用。</p>
+<p>协议可以像其他普通类型一样使用，使用场景:</p>
+<ul>
+<li>作为函数、方法或构造器中的参数类型或返回值类型</li>
+<li>作为常量、变量或属性的类型</li>
+<li>作为数组、字典或其他容器中的元素类型</li>
+</ul>
+<blockquote>
+<p>注意<br />协议是一种类型，因此协议类型的名称应与其他类型(Int，Double，String)的写法相同，使用大写字母开头的驼峰式写法，例如(<code>FullyNamed</code>和<code>RandomNumberGenerator</code>)</p>
+</blockquote>
+<p>如下所示，这个示例中将协议当做类型来使用</p>
+<pre class="swift"><code>class Dice {
+    let sides: Int
+    let generator: RandomNumberGenerator
+    init(sides: Int, generator: RandomNumberGenerator) {
+        self.sides = sides
+        self.generator = generator
+    }
+    func roll() -&gt; Int {
+        return Int(generator.random() * Double(sides)) + 1
+    }
+}</code></pre>
+<p>例子中定义了一个<code>Dice</code>类，用来代表桌游中的拥有N个面的骰子。<code>Dice</code>的实例含有<code>sides</code>和<code>generator</code>两个属性，前者是整型，用来表示骰子有几个面，后者为骰子提供一个随机数生成器。</p>
+<p><code>generator</code>属性的类型为<code>RandomNumberGenerator</code>，因此任何遵循了<code>RandomNumberGenerator</code>协议的类型的实例都可以赋值给<code>generator</code>，除此之外，无其他要求。</p>
+<p><code>Dice</code>类中也有一个构造器(initializer)，用来进行初始化操作。构造器中含有一个名为<code>generator</code>，类型为<code>RandomNumberGenerator</code>的形参。在调用构造方法时创建<code>Dice</code>的实例时，可以传入任何遵循<code>RandomNumberGenerator</code>协议的实例给generator。</p>
+<p><code>Dice</code>类也提供了一个名为<code>roll</code>的实例方法用来模拟骰子的面值。它先使用<code>generator</code>的<code>random()</code>方法来创建一个[0,1)区间内的随机数，然后使用这个随机数生成正确的骰子面值。因为generator遵循了<code>RandomNumberGenerator</code>协议，因而保证了<code>random</code>方法可以被调用。</p>
+<p>下面的例子展示了如何使用<code>LinearCongruentialGenerator</code>的实例作为随机数生成器创建一个六面骰子:</p>
+<pre class="swift"><code>var d6 = Dice(sides: 6, generator: LinearCongruentialGenerator())
+for _ in 1...5 {
+    print(&quot;Random dice roll is \(d6.roll())&quot;)
+}
+//输出结果
+//Random dice roll is 3
+//Random dice roll is 5
+//Random dice roll is 4
+//Random dice roll is 5
+//Random dice roll is 4</code></pre>
+<p><a name="delegation"></a></p>
+<h2 id="委托代理模式">委托(代理)模式</h2>
+<p>委托是一种设计模式，它允许<code>类</code>或<code>结构体</code>将一些需要它们负责的功能<code>交由(委托)</code>给其他的类型的实例。委托模式的实现很简单: 定义协议来封装那些需要被委托的函数和方法， 使其<code>遵循者</code>拥有这些被委托的<code>函数和方法</code>。委托模式可以用来响应特定的动作或接收外部数据源提供的数据，而无需要知道外部数据源的类型信息。</p>
+<p>下面的例子是两个基于骰子游戏的协议:</p>
+<pre class="swift"><code>protocol DiceGame {
+    var dice: Dice { get }
+    func play()
+}
+
+protocol DiceGameDelegate {
+    func gameDidStart(game: DiceGame)
+    func game(game: DiceGame, didStartNewTurnWithDiceRoll diceRoll:Int)
+    func gameDidEnd(game: DiceGame)
+}</code></pre>
+<p><code>DiceGame</code>协议可以在任意含有骰子的游戏中实现。<code>DiceGameDelegate</code>协议可以用来追踪<code>DiceGame</code>的游戏过程</p>
+<p>如下所示，<code>SnakesAndLadders</code>是<code>Snakes and Ladders</code>(<a href="./05_Control_Flow.html">Control Flow</a>章节有该游戏的详细介绍)游戏的新版本。新版本使用<code>Dice</code>作为骰子，并且实现了<code>DiceGame</code>和<code>DiceGameDelegate</code>协议，后者用来记录游戏的过程:</p>
+<pre class="swift"><code>class SnakesAndLadders: DiceGame {
+    let finalSquare = 25
+    let dice = Dice(sides: 6, generator: LinearCongruentialGenerator())
+    var square = 0
+    var board: [Int]
+    init() {
+        board = [Int](count: finalSquare + 1, repeatedValue: 0)
+        board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
+        board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
+    }
+    var delegate: DiceGameDelegate?
+    func play() {
+        square = 0
+        delegate?.gameDidStart(self)
+        gameLoop: while square != finalSquare {
+            let diceRoll = dice.roll()
+            delegate?.game(self,didStartNewTurnWithDiceRoll: diceRoll)
+            switch square + diceRoll {
+            case finalSquare:
+                break gameLoop
+            case let newSquare where newSquare &gt; finalSquare:
+                continue gameLoop
+            default:
+            square += diceRoll
+            square += board[square]
+            }
+        }
+        delegate?.gameDidEnd(self)
+    }
+}</code></pre>
+<p>这个版本的游戏封装到了<code>SnakesAndLadders</code>类中，该类遵循了<code>DiceGame</code>协议，并且提供了相应的可读的<code>dice</code>属性和<code>play</code>实例方法。(<code>dice</code>属性在构造之后就不再改变，且协议只要求<code>dice</code>为只读的，因此将<code>dice</code>声明为常量属性。)</p>
+<p>游戏使用<code>SnakesAndLadders</code>类的<code>构造器(initializer)</code>初始化游戏。所有的游戏逻辑被转移到了协议中的<code>play</code>方法，<code>play</code>方法使用协议规定的<code>dice</code>属性提供骰子摇出的值。</p>
+<p>注意:<code>delegate</code>并不是游戏的必备条件，因此<code>delegate</code>被定义为遵循<code>DiceGameDelegate</code>协议的可选属性。因为<code>delegate</code>是可选值，因此在初始化的时候被自动赋值为<code>nil</code>。随后，可以在游戏中为<code>delegate</code>设置适当的值。</p>
+<p><code>DicegameDelegate</code>协议提供了三个方法用来追踪游戏过程。被放置于游戏的逻辑中，即<code>play()</code>方法内。分别在游戏开始时，新一轮开始时，游戏结束时被调用。</p>
+<p>因为<code>delegate</code>是一个遵循<code>DiceGameDelegate</code>的可选属性，因此在<code>play()</code>方法中使用了<code>可选链</code>来调用委托方法。 若<code>delegate</code>属性为<code>nil</code>， 则delegate所调用的方法失效，并不会产生错误。若<code>delegate</code>不为<code>nil</code>，则方法能够被调用</p>
+<p>如下所示，<code>DiceGameTracker</code>遵循了<code>DiceGameDelegate</code>协议</p>
+<pre class="swift"><code>class DiceGameTracker: DiceGameDelegate {
+    var numberOfTurns = 0
+    func gameDidStart(game: DiceGame) {
+        numberOfTurns = 0
+        if game is SnakesAndLadders {
+            print(&quot;Started a new game of Snakes and Ladders&quot;)
+        }
+        print(&quot;The game is using a \(game.dice.sides)-sided dice&quot;)
+    }
+    func game(game: DiceGame, didStartNewTurnWithDiceRoll diceRoll: Int) {
+        ++numberOfTurns
+        print(&quot;Rolled a \(diceRoll)&quot;)
+    }
+    func gameDidEnd(game: DiceGame) {
+        print(&quot;The game lasted for \(numberOfTurns) turns&quot;)
+    }
+}</code></pre>
+<p><code>DiceGameTracker</code>实现了<code>DiceGameDelegate</code>协议规定的三个方法，用来记录游戏已经进行的轮数。 当游戏开始时，<code>numberOfTurns</code>属性被赋值为0; 在每新一轮中递增; 游戏结束后，输出打印游戏的总轮数。</p>
+<p><code>gameDidStart</code>方法从<code>game</code>参数获取游戏信息并输出。<code>game</code>在方法中被当做<code>DiceGame</code>类型而不是<code>SnakeAndLadders</code>类型，所以方法中只能访问<code>DiceGame</code>协议中的成员。当然了，这些方法也可以在类型转换之后调用。在上例代码中，通过<code>is</code>操作符检查<code>game</code>是否为 <code>SnakesAndLadders</code>类型的实例，如果是，则打印出相应的内容。</p>
+<p>无论当前进行的是何种游戏，<code>game</code>都遵循<code>DiceGame</code>协议以确保<code>game</code>含有<code>dice</code>属性，因此在<code>gameDidStart(_:)</code>方法中可以通过传入的<code>game</code>参数来访问<code>dice</code>属性，进而打印出<code>dice</code>的<code>sides</code>属性的值。</p>
+<p><code>DiceGameTracker</code>的运行情况，如下所示:</p>
+<pre class="swift"><code>let tracker = DiceGameTracker()
+let game = SnakesAndLadders()
+game.delegate = tracker
+game.play()
+// Started a new game of Snakes and Ladders
+// The game is using a 6-sided dice
+// Rolled a 3
+// Rolled a 5
+// Rolled a 4
+// Rolled a 5
+// The game lasted for 4 turns</code></pre>
+<p><a name="adding_protocol_conformance_with_an_extension"></a></p>
+<h2 id="在扩展中添加协议成员">在扩展中添加协议成员</h2>
+<p>即便无法修改源代码，依然可以通过扩展(Extension)来扩充已存在类型(<em>译者注: 类，结构体，枚举等</em>)。扩展可以为已存在的类型添加属性，方法，下标脚本，协议等成员。详情请在<a href="./21_Extensions.html">扩展</a>章节中查看。</p>
+<blockquote>
+<p>注意<br />通过扩展为已存在的类型遵循协议时，该类型的所有实例也会随之添加协议中的方法</p>
+</blockquote>
+<p>例如<code>TextRepresentable</code>协议，任何想要表示一些文本内容的类型都可以遵循该协议。这些想要表示的内容可以是类型本身的描述，也可以是当前内容的版本:</p>
+<pre class="swift"><code>protocol TextRepresentable {
+    func asText() -&gt; String
+}</code></pre>
+<p>可以通过扩展，为上一节中提到的<code>Dice</code>增加类遵循<code>TextRepresentable</code>协议的功能</p>
+<pre class="swift"><code>extension Dice: TextRepresentable {
+    func asText() -&gt; String {
+        return &quot;A \(sides)-sided dice&quot;
+    }
+}</code></pre>
+<p>现在，通过扩展使得<code>Dice</code>类型遵循了一个新的协议，这和<code>Dice</code>类型在定义的时候声明为遵循<code>TextRepresentable</code>协议的效果相同。在扩展的时候，协议名称写在类型名之后，以冒号隔开，在大括号内写明新添加的协议内容。</p>
+<p>现在所有<code>Dice</code>的实例都遵循了<code>TextRepresentable</code>协议:</p>
+<pre class="swift"><code>let d12 = Dice(sides: 12,generator: LinearCongruentialGenerator())
+print(d12.asText())
+// 输出 &quot;A 12-sided dice&quot;</code></pre>
+<p>同样<code>SnakesAndLadders</code>类也可以通过<code>扩展</code>的方式来遵循<code>TextRepresentable</code>协议：</p>
+<pre class="swift"><code>extension SnakesAndLadders: TextRepresentable {
+    func asText() -&gt; String {
+        return &quot;A game of Snakes and Ladders with \(finalSquare) squares&quot;
+    }
+}
+print(game.asText())
+// 输出 &quot;A game of Snakes and Ladders with 25 squares&quot;</code></pre>
+<p><a name="declaring_protocol_adoption_with_an_extension"></a></p>
+<h2 id="通过扩展补充协议声明">通过扩展补充协议声明</h2>
+<p>当一个类型已经实现了协议中的所有要求，却没有声明为遵循该协议时，可以通过扩展(空的扩展体)来补充协议声明:</p>
+<pre class="swift"><code>struct Hamster {
+    var name: String
+    func asText() -&gt; String {
+        return &quot;A hamster named \(name)&quot;
+    }
+}
+extension Hamster: TextRepresentable {}</code></pre>
+<p>从现在起，<code>Hamster</code>的实例可以作为<code>TextRepresentable</code>类型使用</p>
+<pre class="swift"><code>let simonTheHamster = Hamster(name: &quot;Simon&quot;)
+let somethingTextRepresentable: TextRepresentable = simonTheHamster
+print(somethingTextRepresentable.asText())
+// 输出 &quot;A hamster named Simon&quot;</code></pre>
+<blockquote>
+<p>注意<br />即使满足了协议的所有要求，类型也不会自动转变，因此你必须为它做出显式的协议声明</p>
+</blockquote>
+<p><a name="collections_of_protocol_types"></a></p>
+<h2 id="集合中的协议类型">集合中的协议类型</h2>
+<p>协议类型可以在集合使用，表示集合中的元素均为协议类型，下面的例子创建了一个类型为<code>TextRepresentable</code>的数组:</p>
+<pre class="swift"><code>let things: [TextRepresentable] = [game,d12,simonTheHamster]</code></pre>
+<p>如下所示，<code>things</code>数组可以被直接遍历，并打印每个元素的文本表示:</p>
+<pre class="swift"><code>for thing in things {
+    print(thing.asText())
+}
+// A game of Snakes and Ladders with 25 squares
+// A 12-sided dice
+// A hamster named Simon</code></pre>
+<p><code>thing</code>被当做是<code>TextRepresentable</code>类型而不是<code>Dice</code>，<code>DiceGame</code>，<code>Hamster</code>等类型。因此能且仅能调用<code>asText</code>方法</p>
+<p><a name="protocol_inheritance"></a></p>
+<h2 id="协议的继承">协议的继承</h2>
+<p>协议能够继承一个或多个其他协议，可以在继承的协议基础上增加新的内容要求。协议的继承语法与类的继承相似，多个被继承的协议间用逗号分隔:</p>
+<pre class="swift"><code>protocol InheritingProtocol: SomeProtocol, AnotherProtocol {
+    // 协议定义
+}</code></pre>
+<p>如下所示，<code>PrettyTextRepresentable</code>协议继承了<code>TextRepresentable</code>协议</p>
+<pre class="swift"><code>protocol PrettyTextRepresentable: TextRepresentable {
+    func asPrettyText() -&gt; String
+}</code></pre>
+<p>例子中定义了一个新的协议<code>PrettyTextRepresentable</code>，它继承自<code>TextRepresentable</code>协议。任何遵循<code>PrettyTextRepresentable</code>协议的类型在满足该协议的要求时，也必须满足<code>TextRepresentable</code>协议的要求。在这个例子中，<code>PrettyTextRepresentable</code>协议要求其遵循者提供一个返回值为<code>String</code>类型的<code>asPrettyText</code>方法。</p>
+<p>如下所示，扩展<code>SnakesAndLadders</code>，让其遵循<code>PrettyTextRepresentable</code>协议:</p>
+<pre class="swift"><code>extension SnakesAndLadders: PrettyTextRepresentable {
+    func asPrettyText() -&gt; String {
+        var output = asText() + &quot;:\n&quot;
+        for index in 1...finalSquare {
+            switch board[index] {
+                case let ladder where ladder &gt; 0:
+                output += &quot;▲ &quot;
+            case let snake where snake &lt; 0:
+                output += &quot;▼ &quot;
+            default:
+                output += &quot;○ &quot;
+            }
+        }
+        return output
+    }
+}</code></pre>
+<p>上述扩展使得<code>SnakesAndLadders</code>遵循了<code>PrettyTextRepresentable</code>协议，并为每个<code>SnakesAndLadders</code>类型提供了了协议要求的<code>asPrettyText()</code>方法。每个<code>PrettyTextRepresentable</code>类型同时也是<code>TextRepresentable</code>类型，所以在<code>asPrettyText</code>的实现中，可以调用<code>asText()</code>方法。之后在每一行加上换行符，作为输出的开始。然后遍历数组中的元素，输出一个几何图形来表示遍历的结果:</p>
+<ul>
+<li>当从数组中取出的元素的值大于0时，用<code>▲</code>表示</li>
+<li>当从数组中取出的元素的值小于0时，用<code>▼</code>表示</li>
+<li>当从数组中取出的元素的值等于0时，用<code>○</code>表示</li>
+</ul>
+<p>任意<code>SankesAndLadders</code>的实例都可以使用<code>asPrettyText()</code>方法。</p>
+<pre class="swift"><code>print(game.asPrettyText())
+// A game of Snakes and Ladders with 25 squares:
+// ○ ○ ▲ ○ ○ ▲ ○ ○ ▲ ▲ ○ ○ ○ ▼ ○ ○ ○ ○ ▼ ○ ○ ▼ ○ ▼ ○</code></pre>
+<p><a name="class_only_protocol"></a></p>
+<h2 id="类专属协议">类专属协议</h2>
+<p>你可以在协议的继承列表中,通过添加<code>class</code>关键字,限制协议只能适配到类（class）类型。（结构体或枚举不能遵循该协议）。该<code>class</code>关键字必须是第一个出现在协议的继承列表中，其后，才是其他继承协议。</p>
+<pre class="swift"><code>protocol SomeClassOnlyProtocol: class, SomeInheritedProtocol {
+    // class-only protocol definition goes here
+}</code></pre>
+<p>在以上例子中，协议<code>SomeClassOnlyProtocol</code>只能被类（class）类型适配。如果尝试让结构体或枚举类型适配该协议，则会出现编译错误。</p>
+<!--TODO 链接-->
+<blockquote>
+<p>注意<br />当协议想要定义的行为，要求（或假设）它的遵循类型必须是引用语义而非值语义时，应该采用类专属协议。关于引用语义，值语义的更多内容，请查看<a href="./09_Classes_and_Structures.html#structures_and_enumerations_are_value_types">结构体和枚举是值类型</a>和<a href="./09_Classes_and_Structures.html#classes_are_reference_types">类是引用类型</a>。</p>
+</blockquote>
+<p><a name="protocol_composition"></a></p>
+<h2 id="协议合成">协议合成</h2>
+<p>有时候需要同时遵循多个协议。你可以将多个协议采用<code>protocol&lt;SomeProtocol， AnotherProtocol&gt;</code>这样的格式进行组合，称为<code>协议合成(protocol composition)</code>。你可以在<code>&lt;&gt;</code>中罗列任意多个你想要遵循的协议，以逗号分隔。</p>
+<p>下面的例子中，将<code>Named</code>和<code>Aged</code>两个协议按照上述的语法组合成一个协议:</p>
+<pre class="swift"><code>protocol Named {
+    var name: String { get }
+}
+protocol Aged {
+    var age: Int { get }
+}
+struct Person: Named, Aged {
+    var name: String
+    var age: Int
+}
+func wishHappyBirthday(celebrator: protocol&lt;Named, Aged&gt;) {
+    print(&quot;Happy birthday \(celebrator.name) - you&#39;re \(celebrator.age)!&quot;)
+}
+let birthdayPerson = Person(name: &quot;Malcolm&quot;, age: 21)
+wishHappyBirthday(birthdayPerson)
+// 输出 &quot;Happy birthday Malcolm - you&#39;re 21!</code></pre>
+<p><code>Named</code>协议包含<code>String</code>类型的<code>name</code>属性;<code>Aged</code>协议包含<code>Int</code>类型的<code>age</code>属性。<code>Person</code>结构体<code>遵循</code>了这两个协议。</p>
+<p><code>wishHappyBirthday</code>函数的形参<code>celebrator</code>的类型为<code>protocol&lt;Named，Aged&gt;</code>。可以传入任意<code>遵循</code>这两个协议的类型的实例。</p>
+<p>上面的例子创建了一个名为<code>birthdayPerson</code>的<code>Person</code>实例，作为参数传递给了<code>wishHappyBirthday(_:)</code>函数。因为<code>Person</code>同时遵循这两个协议，所以这个参数合法，函数将输出生日问候语。</p>
+<blockquote>
+<p>注意<br /><code>协议合成</code>并不会生成一个新协议类型，而是将多个协议合成为一个临时的协议，超出范围后立即失效。</p>
+</blockquote>
+<p><a name="checking_for_protocol_conformance"></a></p>
+<h2 id="检验协议的一致性">检验协议的一致性</h2>
+<!--TODO 链接-->
+<p>你可以使用<code>is</code>和<code>as</code>操作符来检查是否遵循某一协议或强制转化为某一类型。检查和转化的语法和之前相同(<em>详情查看<a href="./20_Type_Casting.html">类型转换</a></em>):</p>
+<ul>
+<li><code>is</code>操作符用来检查实例是否<code>遵循</code>了某个<code>协议</code></li>
+<li><code>as?</code>返回一个可选值，当实例<code>遵循</code>协议时，返回该协议类型;否则返回<code>nil</code></li>
+<li><code>as</code>用以强制向下转型，如果强转失败，会引起运行时错误。</li>
+</ul>
+<p>下面的例子定义了一个<code>HasArea</code>的协议，要求有一个<code>Double</code>类型可读的<code>area</code>:</p>
+<pre class="swift"><code>protocol HasArea {
+    var area: Double { get }
+}</code></pre>
+<p>如下所示，定义了<code>Circle</code>和<code>Country</code>类，它们都遵循了<code>HasArea</code>协议</p>
+<pre class="swift"><code>class Circle: HasArea {
+    let pi = 3.1415927
+    var radius: Double
+    var area: Double { return pi * radius * radius }
+    init(radius: Double) { self.radius = radius }
+}
+class Country: HasArea {
+    var area: Double
+    init(area: Double) { self.area = area }
+}</code></pre>
+<p><code>Circle</code>类把<code>area</code>实现为基于<code>存储型属性</code>radius的<code>计算型属性</code>，<code>Country</code>类则把<code>area</code>实现为<code>存储型属性</code>。这两个类都<code>遵循</code>了<code>HasArea</code>协议。</p>
+<p>如下所示，Animal是一个没有实现<code>HasArea</code>协议的类</p>
+<pre class="swift"><code>class Animal {
+    var legs: Int
+    init(legs: Int) { self.legs = legs }
+}</code></pre>
+<p><code>Circle</code>，<code>Country</code>，<code>Animal</code>并没有一个相同的基类，然而，它们都是类，它们的实例都可以作为<code>AnyObject</code>类型的变量，存储在同一个数组中:</p>
+<pre class="swift"><code>let objects: [AnyObject] = [
+    Circle(radius: 2.0),
+    Country(area: 243_610),
+    Animal(legs: 4)
+]</code></pre>
+<p><code>objects</code>数组使用字面量初始化，数组包含一个<code>radius</code>为2的<code>Circle</code>的实例，一个保存了英国面积的<code>Country</code>实例和一个<code>legs</code>为4的<code>Animal</code>实例。</p>
+<p>如下所示，<code>objects</code>数组可以被迭代，对迭代出的每一个元素进行检查，看它是否遵循了<code>HasArea</code>协议:</p>
+<pre class="swift"><code>for object in objects {
+    if let objectWithArea = object as? HasArea {
+        print(&quot;Area is \(objectWithArea.area)&quot;)
+    } else {
+        print(&quot;Something that doesn&#39;t have an area&quot;)
+    }
+}
+// Area is 12.5663708
+// Area is 243610.0
+// Something that doesn&#39;t have an area</code></pre>
+<p>当迭代出的元素遵循<code>HasArea</code>协议时，通过<code>as?</code>操作符将其<code>可选绑定(optional binding)</code>到<code>objectWithArea</code>常量上。<code>objectWithArea</code>是<code>HasArea</code>协议类型的实例，因此<code>area</code>属性是可以被访问和打印的。</p>
+<p><code>objects</code>数组中元素的类型并不会因为强转而丢失类型信息，它们仍然是<code>Circle</code>，<code>Country</code>，<code>Animal</code>类型。然而，当它们被赋值给<code>objectWithArea</code>常量时，则只被视为<code>HasArea</code>类型，因此只有<code>area</code>属性能够被访问。</p>
+<p><a name="optional_protocol_requirements"></a></p>
+<h2 id="对可选协议的规定">对可选协议的规定</h2>
+<p>协议可以含有可选成员，其<code>遵循者</code>可以选择是否实现这些成员。在协议中使用<code>optional</code>关键字作为前缀来定义可选成员。</p>
+<!--TODO 链接-->
+<p>可选协议在调用时使用<code>可选链</code>，因为协议的遵循者可能没有实现可选内容，详细内容在<a href="./17_Optional_Chaining.html">可空链式调用</a>章节中查看。</p>
+<p>像<code>someOptionalMethod?(someArgument)</code>这样，你可以在可选方法名称后加上<code>?</code>来检查该方法是否被实现。可选方法和可选属性都会返回一个<code>可选值(optional value)</code>，当其不可访问时，<code>?</code>之后语句不会执行，并整体返回<code>nil</code></p>
+<blockquote>
+<p>注意<br />可选协议只能在含有<code>@objc</code>前缀的协议中生效。且<code>@objc</code>的协议只能被<code>类</code>遵循<br />这个前缀表示协议将暴露给Objective-C代码，详情参见<code>Using Swift with Cocoa and Objective-C</code>。即使你不打算和Objective-C有什么交互，如果你想要指明协议包含可选属性，那么还是要加上<code>@obj</code>前缀</p>
+</blockquote>
+<p>下面的例子定义了一个叫<code>Counter</code>的整数加法类，它使用外部的数据源来实现每次的增量。数据源是两个可选属性，在<code>CounterDataSource</code>协议中定义:</p>
+<pre class="swift"><code>@objc protocol CounterDataSource {
+    optional func incrementForCount(count: Int) -&gt; Int
+    optional var fixedIncrement: Int { get }
+}</code></pre>
+<p><code>CounterDataSource</code>含有<code>incrementForCount</code>可选方法和<code>fiexdIncrement</code>可选属性，它们使用了不同的方法来从数据源中获取合适的增量值。</p>
+<blockquote>
+<p>注意<br /><code>CounterDataSource</code>中的属性和方法都是可选的，因此可以在类中声明都不实现这些成员，尽管技术上允许这样做，不过最好不要这样写。</p>
+</blockquote>
+<p><code>Counter</code>类含有<code>CounterDataSource?</code>类型的可选属性<code>dataSource</code>，如下所示:</p>
+<pre class="swift"><code>@objc class Counter {
+    var count = 0
+    var dataSource: CounterDataSource?
+    func increment() {
+        if let amount = dataSource?.incrementForCount?(count) {
+            count += amount
+        } else if let amount = dataSource?.fixedIncrement? {
+            count += amount
+        }
+    }
+}</code></pre>
+<p>类<code>Counter</code>使用<code>count</code>来存储当前的值。该类同时定义了一个<code>increment</code>方法，每次调用该方法的时候，将会增加<code>count</code>的值。</p>
+<p><code>increment()</code>方法首先试图使用<code>incrementForCount(_:)</code>方法来得到每次的增量。<code>increment()</code>方法使用可选链来尝试调用<code>incrementForCount(_:)</code>，并将当前的<code>count</code>值作为参数传入。</p>
+<p>这里使用了两种可选链方法。由于<code>dataSource</code>可能为<code>nil</code>，因此在<code>dataSource</code>后边加上了<code>?</code>标记来表明只在<code>dataSource</code>非空时才去调用<code>incrementForCount</code>方法。即使<code>dataSource</code>存在，但是也无法保证其是否实现了<code>incrementForCount</code>方法，因此在<code>incrementForCount</code>方法后边也加有<code>?</code>标记。</p>
+<p>调用<code>incrementForCount</code>方法在上述两种情形都有可能失败，所以返回值为<em>可选</em><code>Int</code>类型。虽然在<code>CounterDataSource</code>中，<code>incrementForCount</code>被定义为一个非可选<code>Int</code>(non-optional)，但是这里我们仍然需要返回<em>可选</em><code>Int</code>类型。</p>
+<p>在调用<code>incrementForCount</code>方法后，<code>Int</code>型<code>可选值</code>通过<code>可选绑定(optional binding)</code>自动拆包并赋值给常量<code>amount</code>。如果可选值确实包含一个数值，这表示<code>delegate</code>和方法都存在，之后便将<code>amount</code>加到<code>count</code>上，增加操作完成。</p>
+<p>如果没有从<code>incrementForCount(_:)</code>获取到值，可能是<code>dataSource</code>为nil，或者它并没有实现<code>incrementForCount</code>方法——那么<code>increment()</code>方法将试图从数据源的<code>fixedIncrement</code>属性中获取增量。<code>fixedIncrement</code>也是一个可选型，所以在属性名的后面添加<code>?</code>来试图取回可选属性的值。和之前一样，返回值为可选型。</p>
+<p><code>ThreeSource</code>实现了<code>CounterDataSource</code>协议，它实现来可选属性<code>fixedIncrement</code>，每次返回值<code>3</code>:</p>
+<pre class="swift"><code>@objc class ThreeSource: CounterDataSource {
+    let fixedIncrement = 3
+}</code></pre>
+<p>可以使用<code>ThreeSource</code>的实例作为<code>Counter</code>实例的数据源:</p>
+<pre class="swift"><code>var counter = Counter()
+counter.dataSource = ThreeSource()
+for _ in 1...4 {
+    counter.increment()
+    print(counter.count)
+}
+// 3
+// 6
+// 9
+// 12</code></pre>
+<p>上述代码新建了一个<code>Counter</code>实例；将它的数据源设置为<code>TreeSource</code>实例；调用<code>increment()</code>4次。和你预想的一样，每次在调用的时候，<code>count</code>的值增加3.</p>
+<p>下面是一个更为复杂的数据源<code>TowardsZeroSource</code>，它将使得最后的值变为0:</p>
+<pre class="swift"><code>class TowardsZeroSource: CounterDataSource {
+func incrementForCount(count: Int) -&gt; Int {
+        if count == 0 {
+            return 0
+        } else if count &lt; 0 {
+            return 1
+        } else {
+            return -1
+        }
+    }
+}</code></pre>
+<p><code>TowardsZeroSource</code>实现了<code>CounterDataSource</code>协议中的<code>incrementForCount(_:)</code>方法，以<code>count</code>参数为依据，计算出每次的增量。如果<code>count</code>已经为0，方法返回0，这表示之后不会再有增量。</p>
+<p>你可以配合使用<code>TowardsZeroSource</code>实例和<code>Counter</code>实例来从<code>-4</code>增加到<code>0</code>.一旦增加到<code>0</code>，数值便不会再有变动。</p>
+<p>在下面的例子中，将从<code>-4</code>增加到<code>0</code>。一旦结果为<code>0</code>，便不在增加:</p>
+<pre class="swift"><code>counter.count = -4
+counter.dataSource = TowardsZeroSource()
+for _ in 1...5 {
+    counter.increment()
+    print(counter.count)
+}
+// -3
+// -2
+// -1
+// 0
+// 0</code></pre>
+<p><a name="protocol_extensions"></a></p>
+<h2 id="协议扩展">协议扩展</h2>
+<p>使用扩展协议的方式可以为遵循者提供方法或属性的实现。通过这种方式，可以让你无需在每个遵循者中都实现一次，无需使用全局函数，你可以通过扩展协议的方式进行定义。</p>
+<p>例如，可以扩展<code>RandomNumberGenerator</code>协议，让其提供<code>randomBool()</code>方法。该方法使用协议中要求的<code>random()</code>方法来实现:</p>
+<pre class="swift"><code>extension RandomNumberGenerator {
+    func randomBool() -&gt; Bool {
+        return random() &gt; 0.5
+    }
+}</code></pre>
+<p>通过扩展协议，所有协议的遵循者，在不用任何修改的情况下，都自动得到了这个扩展所增加的方法。</p>
+<pre class="swift"><code>let generator = LinearCongruentialGenerator()
+print(&quot;Here&#39;s a random number: \(generator.random())&quot;)
+// 输出 &quot;Here&#39;s a random number: 0.37464991998171&quot;
+print(&quot;And here&#39;s a random Boolean: \(generator.randomBool())&quot;)
+// 输出 &quot;And here&#39;s a random Boolean: true&quot;</code></pre>
+<h3 id="提供默认实现">提供默认实现</h3>
+<p>可以通过协议扩展的方式来为协议规定的属性和方法提供默认的实现。如果协议的遵循者对规定的属性和方法提供了自己的实现，那么遵循者提供的实现将被使用。</p>
+<blockquote>
+<p>注意<br />通过扩展协议提供的协议实现和可选协议规定有区别。虽然协议遵循者无需自己实现，通过扩展提供的默认实现，可以不是用可选链调用。</p>
+</blockquote>
+<p>例如，<code>PrettyTextRepresentable</code>协议，继承了<code>TextRepresentable</code>协议，可以为其提供一个默认的<code>asPrettyText()</code>方法来简化返回值</p>
+<pre class="swift"><code>extension PrettyTextRepresentable  {
+    func asPrettyText() -&gt; String {
+        return asText()
+    }
+}</code></pre>
+<h3 id="为协议扩展添加限制条件">为协议扩展添加限制条件</h3>
+<p>在扩展协议的时候，可以指定一些限制，只有满足这些限制的协议遵循者，才能获得协议扩展提供的属性和方法。这些限制写在协议名之后，使用<code>where</code>关键字来描述限制情况。(<a href="./23_Generics.html#where_clauses">Where语句</a>)。:</p>
+<p>例如，你可以扩展<code>CollectionType</code>协议，但是只适用于元素遵循<code>TextRepresentable</code>的情况:</p>
+<pre class="swift"><code>extension CollectionType where Generator.Element : TextRepresentable {
+    func asList() -&gt; String {
+        return &quot;(&quot; + &quot;, &quot;.join(map({$0.asText()})) + &quot;)&quot;
+    }
+}</code></pre>
+<p><code>asList()</code>方法将每个元素以<code>asText()</code>的方式表示，最后以逗号分隔链接起来。</p>
+<p>现在我们来看<code>Hamster</code>，它遵循<code>TextRepresentable</code>:</p>
+<pre class="swift"><code>let murrayTheHamster = Hamster(name: &quot;Murray&quot;)
+let morganTheHamster = Hamster(name: &quot;Morgan&quot;)
+let mauriceTheHamster = Hamster(name: &quot;Maurice&quot;)
+let hamsters = [murrayTheHamster, morganTheHamster, mauriceTheHamster]</code></pre>
+<p>因为<code>Array</code>遵循<code>CollectionType</code>协议，数组的元素又遵循<code>TextRepresentable</code>协议，所以数组可以使用<code>asList()</code>方法得到数组内容的文本表示:</p>
+<pre class="swift"><code>print(hamsters.asList())
+// 输出 &quot;(A hamster named Murray, A hamster named Morgan, A hamster named Maurice)&quot;</code></pre>
+<blockquote>
+<p>注意<br />如果有多个协议扩展，而一个协议的遵循者又同时满足它们的限制，那么将会使用所满足限制最多的那个扩展。</p>
+</blockquote>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
